@@ -1,5 +1,5 @@
 #-------------------------------import----------------------------------#
-import discord, logging, asyncio
+import discord, logging, asyncio, random
 #-----------------------------------------------------------------------#
 
 #-------------------------------variables-------------------------------#
@@ -10,6 +10,7 @@ luckies = {822474721525628979: 1, 259716396198395904: 2, 543857545278783520: 3, 
 fighting = False #for the Arena game
 #p1, p2 = None, None #defining players, will be changed to Fighter class on init
 PLAYERHP = 100 #Starting health for both players
+mode = ""
 #-----------------------------------------------------------------------#
 
 #Logging errors
@@ -19,20 +20,22 @@ logging.basicConfig(level=logging.WARNING) #Errors and stuff show in the termina
 
 #Launch text in terminal
 @client.event
-async def on_ready():
+async def on_ready(): #login text, init fighters, turn = p1
     print('We have logged in as {0.user}'.format(client))
     #Initialize players
     global p1
     global p2
+    global turn
     p1 = Fighter()
     p2 = Fighter()
+    turn = p1
 
 #Reading messages
 @client.event
 async def on_message(message):
-    if message.author == client.user: #so that the bot doesn't message itself
+    """if message.author == client.user: #so that the bot doesn't message itself
         return
-    
+    """
     global fighting #takes fighting status variable
     if fighting == True: #If people are fighting then we call fight
         await asyncio.gather(fight(message))
@@ -43,7 +46,7 @@ async def on_message(message):
         else: 
             await message.channel.send("There is already a fight going on between " + str(p1.tag) + " and " + str(p2.tag) + " and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
         
-    elif ('kill me' or ('i' and 'die')) in message.content.lower(): #suicide prevention
+    elif ('kill me' or ('i ' and 'die')) in message.content.lower(): #suicide prevention
         await message.channel.send("Please not worry. @everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
         await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
 
@@ -56,14 +59,22 @@ async def on_message(message):
     elif 'fegg' in message.content.lower(): #greetings
         embedVar = discord.Embed(title="Hello", description="My name is Fegg.", color=0x00ff00)
         embedVar.add_field(name="Your name is not Fegg.", value="hi", inline=False)
-        embedVar.add_field(name="Your name is "+ str(message.author), value="hi again", inline=False)
+        embedVar.add_field(name="Your name is "+ str(message.name), value="hi again", inline=False)
         embedVar.set_thumbnail(url=(message.author.avatar_url))
         await message.channel.send(embed=embedVar)
 
+    elif (message.content.lower() == '!forceresume'):
+         if (message.author.id == p1.id or message.author.id == p2.id):
+            fighting = True
+            await asyncio.gather(reporthp(message, "FORCERESUME"))
+        
+
 async def startfight(message): #called when a fight starts
+    global turn
     global fighting
     global p1 #gets player variables
     global p2 #fighting = False
+    turn = p1
     p1.reset(message.author)#initiates player 1 with PLAYERHP
     try:
         p2.reset(message.mentions[0]) #inits player 2 the same way
@@ -103,17 +114,22 @@ async def fight(message):
     global p1
     global p2
     global fighting
+    global turn
+    if (message.content.lower() == "roll"):
+        if message.author.id == turn.id:
+            damage = random.randint(0, 20)
+            if turn.id == p1.id: other = p2
+            else: other = p1
+            other.hp -= damage
+            await asyncio.gather(reporthp(message, str(damage))) #The order in which these occur matters.
+            turn = other
+            await asyncio.gather(checkstuff(message, damage))
+
     if (message.content.lower() == "!quit" and (message.author.id == p1.id or message.author.id == p2.id)): #to abort the match
-        embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has been aborted.", description=(p1.name + " hp: " + str(p1.hp) + "\n" + p2.name + " hp: " + str(p2.hp)), color=0x00ff00)
+        embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has been aborted.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
         await message.channel.send(embed=embedVar) #match over and hp text
 
-        embedVar = discord.Embed(title=(p1.tag.name + "'s stats:"), description=p1.stats(), color=0x00ff00)
-        embedVar.set_thumbnail(url=(p1.tag.avatar_url)) #stats for player 1
-        await message.channel.send(embed=embedVar)
-
-        embedVar = discord.Embed(title=(p2.tag.name + "'s stats:"), description=p2.stats(), color=0x00ff00)
-        embedVar.set_thumbnail(url=(p2.tag.avatar_url)) #stats for player 2
-        await message.channel.send(embed=embedVar)
+        await asyncio.gather(reportstats(message))
         """
         await message.channel.send("The match has been aborted.")
         await message.channel.send("The score is\n" + p1.name + " hp: " + str(p1.hp) + "\n" + p2.name + " hp: " + str(p2.hp))
@@ -122,6 +138,30 @@ async def fight(message):
         await message.channel.send(p2.stats())
         """
         fighting = False
+
+async def reportstats(message):
+    global p1
+    global p1
+    embedVar = discord.Embed(title=(p1.tag.name + "'s stats:"), description=p1.stats(), color=0x00ff00)
+    embedVar.set_thumbnail(url=(p1.tag.avatar_url)) #stats for player 1
+    await message.channel.send(embed=embedVar)
+
+    embedVar = discord.Embed(title=(p2.tag.name + "'s stats:"), description=p2.stats(), color=0x00ff00)
+    embedVar.set_thumbnail(url=(p2.tag.avatar_url)) #stats for player 2
+    await message.channel.send(embed=embedVar)
+
+async def reporthp(message, damage):
+    global p1
+    global p2
+    global turn
+    embedVar = discord.Embed(title=(turn.tag.name + " did **" + damage + "** damage!"), description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+    embedVar.set_thumbnail(url=(turn.tag.avatar_url)) #reports damage and hp after someone does damage
+    await message.channel.send(embed=embedVar)
+
+async def checkstuff(message, damage):
+    #Checks if they got any special numbers
+    #Checks if the game is over
+    await message.channel.send("roll")
 
 class Fighter:
     """ def __init__(self, tag):
