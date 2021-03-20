@@ -4,7 +4,7 @@ import discord, logging, asyncio, random
 
 #-------------------------------variables-------------------------------#
 client = discord.Client()
-TOKEN = 'ODIyNDc0NzIxNTI1NjI4OTc5.YFSzRg.NE2o2SRi4Dr6XwBWDCuwQ0Ttv1M' #Bot token
+TOKEN = '' #Bot token
 #Lucky numbers of the members in the Arena, as a dictionary
 luckies = {822474721525628979: 1, 259716396198395904: 2, 543857545278783520: 3, 400514653957914635: 4, 246080207704817664: 5, 567819726013726722: 6, 332711880831270912: 7, 320559692269223938: 8, 194310041900154880: 9, 548617575282769922: 10, 640714673045504020: 11, 175824478423482368: 13, 294736827946893313: 16, 748751242003611739: 18, 731368690364186634: 19}
 fighting = False #for the Arena game
@@ -188,6 +188,8 @@ class Fighter:
         return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties, **" + str(self.luckies) + "** lucky numbers, and **" + str(self.seventeens) + "** seventeens.")
 
 #Launch bot
+with open('token.txt') as f:
+    TOKEN = f.readline()
 client.run(TOKEN)
 
 #Reference
