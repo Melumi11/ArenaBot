@@ -11,6 +11,7 @@ fighting = False #for the Arena game
 #p1, p2 = None, None #defining players, will be changed to Fighter class on init
 PLAYERHP = 100 #Starting health for both players
 mode = ""
+MELUMI = 640714673045504020
 #-----------------------------------------------------------------------#
 
 #Logging errors
@@ -50,8 +51,8 @@ async def on_message(message):
         await message.channel.send("Please not worry. @everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
         await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
 
-    elif 'kill' in message.content.lower(): #knife emoji
-        await message.channel.send(":knife:")
+    elif 'parm' in message.content.lower(): #parm
+        await message.channel.send("https://images.heb.com/is/image/HEBGrocery/000081264")
 
     elif message.content.lower() == '!sweat': #big sweat
         await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
@@ -64,7 +65,7 @@ async def on_message(message):
         await message.channel.send(embed=embedVar)
 
     elif (message.content.lower() == '!forceresume'):
-         if (message.author.id == p1.id or message.author.id == p2.id):
+         if (message.author.id == p1.id or message.author.id == p2.id or message.author.id == MELUMI):
             fighting = True
             await asyncio.gather(reporthp(message, "FORCERESUME"))
         
@@ -127,8 +128,8 @@ async def fight(message):
 
     if (message.content.lower() == "!quit" and (message.author.id == p1.id or message.author.id == p2.id)): #to abort the match
         embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has been aborted.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+        embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||", inline=False)
         await message.channel.send(embed=embedVar) #match over and hp text
-
         await asyncio.gather(reportstats(message))
         """
         await message.channel.send("The match has been aborted.")
@@ -185,7 +186,7 @@ class Fighter:
         self.seventeens = 0
 
     def stats(self):
-        return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties, **" + str(self.luckies) + "** lucky numbers, and **" + str(self.seventeens) + "** seventeens.")
+        return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties,\n **" + str(self.luckies) + "** lucky numbers, and **" + str(self.seventeens) + "** seventeens.")
 
 #Launch bot
 with open('token.txt') as f:
