@@ -173,6 +173,7 @@ async def fight(message):
         await message.channel.send(p2.stats())
         """
         fighting = False
+        mode = ""
 
 async def reportstats(message):
     global p1
