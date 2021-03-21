@@ -68,6 +68,13 @@ async def on_message(message):
             fighting = True
             await asyncio.gather(reporthp(message, "FORCERESUME"))
         
+    elif message.content.startswith("!roll d"):
+        try:
+            if len(message.content) == 8: await message.channel.send(str(random.randint(1, int(message.content[7]))))
+            if len(message.content) == 9: await message.channel.send(str(random.randint(1, (int(message.content[7]) * 10 + int(message.content[8])))))
+            if len(message.content) == 10: await message.channel.send(str(random.randint(1, (int(message.content[7]) * 100 + int(message.content[8]) * 10) + int(message.content[9]))))
+        except: pass
+
 
 async def startfight(message): #called when a fight starts
     global turn
@@ -137,7 +144,7 @@ async def fight(message):
                 if turn.id == p1.id: other = p2
                 else: other = p1
                 #Instead of reporthp
-                embedVar = discord.Embed(title=(turn.tag.name + " healed **" + damage + "** health!"), description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+                embedVar = discord.Embed(title=(turn.tag.name + " healed **" + str(damage) + "** health!"), description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
                 embedVar.set_author(name=turn.tag.name, icon_url=(turn.tag.avatar_url))
                 await message.channel.send(embed=embedVar)
 
@@ -147,13 +154,22 @@ async def fight(message):
     if (message.content.lower() == "roll"):
         if mode == "17":
             await message.channel.send("Please choose whether to `heal` or `attack`.")
+        elif mode == "clash":
+            await asyncio.gather(clash(message))
         elif message.author.id == turn.id:
             damage = random.randint(1, 20)
+            if turn == p1: 
+                p1.last = damage
+                other = p2
+            else: 
+                other = p1
+                if p1.last == damage:
+                    mode = "clash"
+                    await asyncio.gather(clashstart(message, damage))
+                    return
             await asyncio.gather(processattack(message, damage))
             if mode == "17":
                 return
-            if turn == p1: other = p2
-            else: other = p1
             other.hp -= damage
             await asyncio.gather(reporthp(message, str(damage))) #The order in which these occur matters.
             await asyncio.gather(checkstuff(message, damage))
@@ -206,6 +222,8 @@ async def checkstuff(message, damage):
             embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has ended.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
             await message.channel.send(embed=embedVar) #match over and hp text
             await asyncio.gather(reportstats(message))
+            global fighting
+            fighting = False
 
 #runs after someone rolls
 async def processattack(message, dmg):
@@ -243,6 +261,61 @@ async def processattack(message, dmg):
         await message.channel.send(embed=embedVar)
         damage = 30
 
+#Start clash text, sets turn to p1
+async def clashstart(message, damage):
+    global turn
+    embedVar = discord.Embed(title=("Clash!"), description="Both players got a " + str(damage), color=0x00ff00)
+    embedVar.add_field(name="Both players will now roll d100s", value="You need to win two out of three rolls.\n" + p1.name + " goes first.", inline=False)
+    await message.channel.send(embed=embedVar)
+    turn = p1
+
+#Processes chash rolls
+async def clash(message):
+    if (message.content.lower() == "roll"):
+        global turn
+        if message.author.id == turn.id:
+            damage = random.randint(1, 100)
+            if turn.id == p1.id:
+                p2.last = damage
+            else:
+                if damage > p2.last:
+                    p2.clash += 1
+                elif damage < p2.last:
+                    p1.clash += 1
+                else:
+                    await message.channel.send("wtf you got the same number and idk what to do so I won't count this one")
+                global mode
+                if p1.clash == 2:
+                    #p1 wins
+                    p1.hp += p1.last
+                    embedVar = discord.Embed(title=(p1.tag.name + " won the clash!"), description=("The clash score is: " + p1.name + ": " + str(p1.clash) + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+                    embedVar.set_thumbnail(url=(message.author.avatar_url))
+                    await message.channel.send(embed=embedVar)
+                    await asyncio.gather(reporthp(message, p1.last))
+                    mode = ""
+                    p2.last = -1
+                    turn = p1
+                    p1.clashwins += 1
+                    return
+                elif p2.clash == 2:
+                    #p2 wins also give back hp to p1
+                    #graphic stuff
+                    p2.hp += p1.last
+                    embedVar = discord.Embed(title=(p2.tag.name + " won the clash!"), description=("The clash score is: " + p1.name + ": " + str(p1.clash) + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+                    embedVar.set_thumbnail(url=(message.author.avatar_url))
+                    await message.channel.send(embed=embedVar)
+                    await asyncio.gather(reporthp(message, p1.last))
+                    mode = ""
+                    p2.last = -1
+                    turn = p1
+                    p2.clashwins += 1
+                    return
+            embedVar = discord.Embed(title=(turn.tag.name + " got a **" + str(damage) + "**!!"), description=("The clash score is: " + p1.name + ": " + str(p1.clash) + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+            embedVar.set_author(name=(turn.tag.name + " roll"), icon_url=(turn.tag.avatar_url))
+            await message.channel.send(embed=embedVar)
+            if turn.id == p1.id: turn = p2
+            else: turn = p1
+
 class Fighter:
     """ def __init__(self, tag):
         self.tag = tag #discord tag
@@ -263,9 +336,13 @@ class Fighter:
         self.twenties = 0
         self.luckies = 0
         self.seventeens = 0
+        self.clashwins = 0
+
+        self.last = -1
+        self.clash = 0
 
     def stats(self):
-        return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties,\n **" + str(self.luckies) + "** lucky numbers, and **" + str(self.seventeens) + "** seventeens.")
+        return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties,\n **" + str(self.luckies) + "** lucky numbers, **" + str(self.seventeens) + "** seventeens, and **" + str(self.clashwins) + "** clash wins.")
 
 #Launch bot
 with open('token.txt') as f:
