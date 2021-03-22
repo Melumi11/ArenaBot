@@ -155,9 +155,12 @@ async def fight(message): #called everytime fight is active, processes rolls.
         elif mode == "clash": #keep clashing
             await asyncio.gather(clash(message))
         elif message.author.id == turn.id: #the person whose turn it is rolls
-            damage = random.randint(1, 20)
+            if (turn.id == p1.id and p2.hp - p1.hp >= 30): damage = random.randint(1, 30)
+            elif (turn.id == p2.id and p1.hp - p2.hp >= 30): damage = random.randint(1, 30)
+            else: damage = random.randint(1, 20)
             if turn == p1: 
                 p1.last = damage
+                p1.rolls.append(damage)
                 other = p2
             else: 
                 other = p1
@@ -252,11 +255,38 @@ async def checkstuff(message, damage):
             fighting = False #stops the fight
             mode = ""
         elif (p1.hp <= 0 or p2.hp <= 0):
-            embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has ended.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+            embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has ended.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)) + "\nPlease update your stats and awards, and try to remember as I can't check all of them.", color=0x00ff00)
             await message.channel.send(embed=embedVar) #match over and hp text
             await asyncio.gather(reportstats(message))
             fighting = False
             mode = ""
+            if (p1.hp == 0 or p2.hp == 0):
+                embedVar = discord.Embed(title=("You finished your opponent with the exact number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if (p1.hp <= -15 or p2.hp <= -15):
+                embedVar = discord.Embed(title=("You finished your opponent to -15 HP!"), description="You may be eligible for an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if (p1.hp >= 30 or p2.hp >= 30):
+                embedVar = discord.Embed(title=("You finished your opponent with 30 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if (p1.hp >= 50 or p2.hp >= 50):
+                embedVar = discord.Embed(title=("You finished your opponent with 50 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if (p1.hp >= 70 or p2.hp >= 70):
+                embedVar = discord.Embed(title=("You finished your opponent with 70 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if ((p1.rolls[0] == 20 and p2.rolls[0] == 1) or (p2.rolls[0] == 20 and p2.rolls[0] == 1)):
+                embedVar = discord.Embed(title=("Your first roll was a 20 and your opponent's was a miss!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if ((p1.rolls[-1] == luckies[p1.id]) or (p2.rolls[-1] == luckies[p2.id])):
+                embedVar = discord.Embed(title=("You finished your opponent with your lucky number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+            if ((p1.rolls[-1] == 20) or (p2.rolls[-1] == 20)):
+                embedVar = discord.Embed(title=("You finished your opponent with a special attack!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                await message.channel.send(embed=embedVar)
+    if ((p1.hp >= 125) or (p2.hp >= 125)):
+            embedVar = discord.Embed(title=("You have over 125 health!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+            await message.channel.send(embed=embedVar)
 
 #Start clash text, sets turn to p1
 async def clashstart(message, damage):
@@ -304,7 +334,7 @@ async def clash(message):
                     winner = None
                     p1.clash, p2.clash = 0, 0
                     return
-            embedVar = discord.Embed(title=(turn.tag.name + " got a **" + str(damage) + "**!!"), description=("The clash score is: " + p1.name + ": " + str(p1.clash) + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+            embedVar = discord.Embed(title=(turn.tag.name + " got a **" + str(damage) + "**!!"), description=("The clash score is: \n" + p1.name + ": " + str(p1.clash) + "\n" + p2.name + ": " + str(p2.clash)), color=0x00ff00)
             embedVar.set_author(name=(turn.tag.name + " roll"), icon_url=(turn.tag.avatar_url))
             await message.channel.send(embed=embedVar) #Reports roll
             if turn.id == p1.id: turn = p2
