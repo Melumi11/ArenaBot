@@ -47,7 +47,7 @@ async def on_message(message):
             if fighting == False:
                 await asyncio.gather(startfight(message))
             else: 
-                await message.channel.send("There is already a fight going on between " + str(p1.tag) + " and " + str(p2.tag) + " and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+                await message.channel.send(f"There is already a fight going on between {p1.tag} and {p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
 
         elif lower == '!sweat': #big sweat
             await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
@@ -97,8 +97,8 @@ async def startfight(message): #called when a fight starts
             global mode
             mode = ""
             try: #checks if the lucky numbers are registered
-                embedVar = discord.Embed(title=("**" + p1.tag.name + "** challenges **" + p2.tag.name + "** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
-                embedVar.add_field(name=("**" + p1.tag.name + "**'s lucky number is " + str(luckies[p1.id]) + " and **" + p2.tag.name + "**'s is " + str(luckies[p2.id])), 
+                embedVar = discord.Embed(title=(f"**{p1.tag.name}** challenges **{p2.tag.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
+                embedVar.add_field(name=(f"**{p1.tag.name}**'s lucky number is {luckies[p1.id]} and **{p2.tag.name}**'s is {luckies[p2.id]}."), 
                                     value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
                 embedVar.set_thumbnail(url=(message.author.avatar_url))
                 await message.channel.send(embed=embedVar)
@@ -106,12 +106,12 @@ async def startfight(message): #called when a fight starts
                 try:
                     luckies[p1.id] #checking to see both players' lucky numbers are registered
                 except KeyError:
-                    await message.channel.send("Uh oh, " + p1.name + "'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
+                    await message.channel.send(f"Uh oh, {p1.name}'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
                     fighting = False
                 try:
                     luckies[p2.id]
                 except KeyError:
-                    await message.channel.send("Uh oh, " + p2.name + "'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
+                    await message.channel.send(f"Uh oh, {p2.name}'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
                     fighting = False
 
 async def fight(message): #called everytime fight is active, processes rolls.
@@ -142,7 +142,7 @@ async def fight(message): #called everytime fight is active, processes rolls.
                 if turn.id == p1.id: other = p2
                 else: other = p1
                 #Instead of reporthp
-                embedVar = discord.Embed(title=(turn.tag.name + " healed **" + str(damage) + "** health!"), description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+                embedVar = discord.Embed(title=(f"{turn.tag.name} healed **{damage}** health!"), description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
                 embedVar.set_author(name=turn.tag.name, icon_url=(turn.tag.avatar_url))
                 await message.channel.send(embed=embedVar)
                 mode = ""
@@ -178,7 +178,7 @@ async def fight(message): #called everytime fight is active, processes rolls.
             await message.channel.send("roll") #fegg attack, will remove later
 
     if (message.content.lower() == "!quit" and (message.author.id == p1.id or message.author.id == p2.id)): #to abort the match
-        embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has been aborted.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+        embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has been aborted.", description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
         embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||", inline=False)
         await message.channel.send(embed=embedVar) #match over and hp text
         await asyncio.gather(reportstats(message))
@@ -238,7 +238,7 @@ async def reporthp(message, damage):
     global p1
     global p2
     global turn
-    embedVar = discord.Embed(title=(turn.tag.name + " did **" + damage + "** damage!"), description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+    embedVar = discord.Embed(title=(f"{turn.tag.name} did **{damage}** damage!"), description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
     embedVar.set_author(name=(turn.tag.name + " roll"), icon_url=(turn.tag.avatar_url))
     await message.channel.send(embed=embedVar)
 
@@ -248,14 +248,14 @@ async def checkstuff(message, damage):
         global fighting
         global mode
         if (p1.hp <= 0 and p2.hp <= 0): #draw
-            embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has ended in a draw.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)), color=0x00ff00)
+            embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has ended in a draw.", description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
             embedVar.add_field(name=("Please update your stats with a draw."), value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.", inline=False)
             await message.channel.send(embed=embedVar) #match over and hp text
             await asyncio.gather(reportstats(message))
             fighting = False #stops the fight
             mode = ""
         elif (p1.hp <= 0 or p2.hp <= 0):
-            embedVar = discord.Embed(title="The match between " + p1.tag.name + " and " + p2.tag.name + " has ended.", description=(p1.name + " HP: " + str(p1.hp) + "\n" + p2.name + " HP: " + str(p2.hp)) + "\nPlease update your stats and awards, and try to remember as I can't check all of them.", color=0x00ff00)
+            embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has ended.", description=f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}\nPlease update your stats and awards, and try to remember as I can't check all of them.", color=0x00ff00)
             await message.channel.send(embed=embedVar) #match over and hp text
             await asyncio.gather(reportstats(message))
             fighting = False
@@ -323,7 +323,7 @@ async def clash(message):
                 elif p2.clash >= 2: winner = p2
                 if winner.clash >= 2: #winner text and stuff, quits function
                     winner.hp += p1.last
-                    embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=("The clash score is: " + p1.name + ": " + str(p1.clash) + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+                    embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=f"The clash score is:\n{p1.name}: {p1.clash}\n{p2.name}: {p2.clash}", color=0x00ff00)
                     embedVar.set_thumbnail(url=(winner.avatar_url))
                     await message.channel.send(embed=embedVar)
                     await asyncio.gather(reporthp(message, p1.last))
@@ -334,7 +334,7 @@ async def clash(message):
                     winner = None
                     p1.clash, p2.clash = 0, 0
                     return
-            embedVar = discord.Embed(title=(turn.tag.name + " got a **" + str(damage) + "**!!"), description=("The clash score is: \n" + p1.name + ": " + str(p1.clash) + "\n" + p2.name + ": " + str(p2.clash)), color=0x00ff00)
+            embedVar = discord.Embed(title=(f"{turn.tag.name} got a **{damage}**!!"), description=(f"The clash score is:\n{p1.name}: {p1.clash}\n{p2.name}: {p2.clash}"), color=0x00ff00)
             embedVar.set_author(name=(turn.tag.name + " roll"), icon_url=(turn.tag.avatar_url))
             await message.channel.send(embed=embedVar) #Reports roll
             if turn.id == p1.id: turn = p2
@@ -358,7 +358,7 @@ class Fighter: #Arena game player class
         self.rolls = []
 
     def stats(self):
-        return (self.name + " got **" + str(self.ones) + "** ones, **" + str(self.twenties) + "** twenties,\n **" + str(self.luckies) + "** lucky numbers, **" + str(self.seventeens) + "** seventeens, and **" + str(self.clashwins) + "** clash wins.")
+        return (f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
 
 #Launch bot
 with open('token.txt') as f:
