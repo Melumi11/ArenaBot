@@ -69,6 +69,19 @@ async def on_message(message):
             embedVar.add_field(name=("List of commands:"), value="!help (this command)\n!fight (fight command for the Arena)\n!sweat (:colinsweat:)\n!roll (rolls a die, syntax: `!roll d20`)", inline=False)
             await message.channel.send(embed=embedVar)
         
+        elif message.content.startswith("!setlucky"):
+            if message.author.id in luckies.keys():
+                await message.channel.send("Your lucky number is already set as " + str(luckies[message.author.id]))
+            elif len(message.content) <= 10:
+                await message.channel.send("Please type the command like `!setlucky 1` or `!setlucky 11`")
+            else: 
+                if message.content[10:].isdigit():
+                    num = message.content[10:]
+                    if (num > 0 and num <= 20):
+                        luckies[message.author.id] = num
+                        await message.channel.send("Your lucky number has been temporarily set as " + str(luckies[message.author.id]))
+                    else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
+
     elif ('kill me' or ('i ' and 'die')) in lower: #suicide prevention
         await message.channel.send("Please not worry. @everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
         await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
@@ -106,12 +119,12 @@ async def startfight(message): #called when a fight starts
                 try:
                     luckies[p1.id] #checking to see both players' lucky numbers are registered
                 except KeyError:
-                    await message.channel.send(f"Uh oh, {p1.name}'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
+                    await message.channel.send(f"Uh oh, {p1.name}'s lucky number is not in my database. Please ask {MELUMI} for help.")
                     fighting = False
                 try:
                     luckies[p2.id]
                 except KeyError:
-                    await message.channel.send(f"Uh oh, {p2.name}'s lucky number is not in my database. Please ask <@640714673045504020> for help.")
+                    await message.channel.send(f"Uh oh, {p2.name}'s lucky number is not in my database. Please ask {MELUMI} for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
                     fighting = False
 
 async def fight(message): #called everytime fight is active, processes rolls.
