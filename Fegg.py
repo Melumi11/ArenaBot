@@ -16,13 +16,13 @@ MELUMI = 640714673045504020
 
 #Logging errors
 logging.basicConfig(level=logging.ERROR)
-logging.basicConfig(level=logging.CRITICAL)
-logging.basicConfig(level=logging.WARNING) #Errors and stuff show in the terminal
+#logging.basicConfig(level=logging.CRITICAL)
+#logging.basicConfig(level=logging.WARNING) #Errors and stuff show in the terminal
 
 #Launch text in terminal
 @client.event
 async def on_ready(): #login text, init fighters, turn = p1
-    print('We have logged in as {0.user}'.format(client))
+    print(f'We have logged in as {client.user}')
     #Initialize players
     global p1
     global p2
@@ -38,38 +38,36 @@ async def on_message(message):
         return
     """
     global fighting #takes fighting status variable
-    if fighting == True: #If people are fighting then we call fight
-        await asyncio.gather(fight(message))
+    if fighting: #If people are fighting then we call fight
+        await fight(message)
     
-    lower = message.content.lower() #converts message to lowercase (cuz it's used a lot)
-    if message.content.startswith('!'): 
-        if message.content.startswith("!fight"): #begin fight if no one is fighting
-            if fighting == False:
-                await asyncio.gather(startfight(message))
+    message_lower = message.content.lower() #converts message to lowercase (cuz it's used a lot)
+    if message_lower.startswith('!'): 
+        if message_lower.startswith("!fight"): #begin fight if no one is fighting
+            if not fighting:
+                await startfight(message)
             else: 
                 await message.channel.send(f"There is already a fight going on between {p1.tag} and {p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
 
-        elif lower == '!sweat': #big sweat
+        elif message_lower == '!sweat': #big sweat
             await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
-        elif (lower == '!forceresume'): #resumes fight if accidentally quit
-         if (message.author.id == p1.id or message.author.id == p2.id or message.author.id == MELUMI):
+        elif message_lower == '!forceresume': #resumes fight if accidentally quit
+         if message.author.id in {p1.id, p2.id, MELUMI}:
             fighting = True
-            await asyncio.gather(reporthp(message, "FORCERESUME"))
+            await reporthp(message, "FORCERESUME")
         
-        elif message.content.startswith("!roll d"): #dice roll command (up to 999)
+        elif message_lower.startswith("!roll d"): #dice roll command (up to 999)
             try:
-                if len(message.content) == 8: await message.channel.send(str(random.randint(1, int(message.content[7]))))
-                if len(message.content) == 9: await message.channel.send(str(random.randint(1, (int(message.content[7]) * 10 + int(message.content[8])))))
-                if len(message.content) == 10: await message.channel.send(str(random.randint(1, (int(message.content[7]) * 100 + int(message.content[8]) * 10) + int(message.content[9]))))
+                await message.channel.send(str(random.randint(1, int(message.content[7:]))))
             except: pass
         
-        elif (lower == '!help'): #help command
+        elif message_lower == '!help': #help command
             embedVar = discord.Embed(title="Hello", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
             embedVar.add_field(name=("List of commands:"), value="!help (this command)\n!fight (fight command for the Arena)\n!sweat (:colinsweat:)\n!roll (rolls a die, syntax: `!roll d20`)", inline=False)
             await message.channel.send(embed=embedVar)
         
-        elif message.content.startswith("!setlucky"):
+        elif message_lower.startswith("!setlucky"):
             if message.author.id in luckies.keys():
                 await message.channel.send("Your lucky number is already set as " + str(luckies[message.author.id]))
             elif len(message.content) <= 10:
@@ -77,16 +75,16 @@ async def on_message(message):
             else: 
                 if message.content[10:].isdigit():
                     num = message.content[10:]
-                    if (num > 0 and num <= 20):
+                    if 0 < num <= 20:
                         luckies[message.author.id] = num
                         await message.channel.send("Your lucky number has been temporarily set as " + str(luckies[message.author.id]))
                     else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
 
-    elif ('kill me' or ('i ' and 'die')) in lower: #suicide prevention
+    elif 'kill me' in message_lower or ('i ' in message_lower and 'die' in message_lower): #suicide prevention
         await message.channel.send("Please not worry. @everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
         await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
 
-    elif 'parm' in lower: #parm
+    elif 'parm' in message_lower: #parm
         await message.channel.send("https://images.heb.com/is/image/HEBGrocery/000081264")
     
 
@@ -135,20 +133,20 @@ async def fight(message): #called everytime fight is active, processes rolls.
     global mode
     global other
     global damage
-    if (mode == "17"): #if the last roll was a 17
-        if ('attack' in message.content.lower()): #attacks for 17
-            if (message.author.id == turn.id):
+    if mode == "17": #if the last roll was a 17
+        if 'attack' in message.content.lower(): #attacks for 17
+            if message.author.id == turn.id:
                 damage = 17
                 if turn.id == p1.id: other = p2 #Regular attacking biz
                 else: other = p1
                 other.hp -= damage
-                await asyncio.gather(reporthp(message, str(damage))) #The order in which these occur matters.
+                await reporthp(message, str(damage)) #The order in which these occur matters.
                 turn = other
-                await asyncio.gather(checkstuff(message, damage))
+                await checkstuff(message, damage)
                 mode = ""
             else: await message.channel.send("Who are you?")
-        if ('heal' in message.content.lower()): #heals for 4d7
-            if (message.author.id == turn.id):
+        if 'heal' in message.content.lower(): #heals for 4d7
+            if message.author.id == turn.id:
                 damage = random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7)
                 turn.seventeens += 1 #update stats
                 turn.hp += damage #heal
@@ -160,16 +158,16 @@ async def fight(message): #called everytime fight is active, processes rolls.
                 await message.channel.send(embed=embedVar)
                 mode = ""
                 turn = other
-                #await asyncio.gather(checkstuff(message, damage)) #we shouldn't need this
+                #await checkstuff(message, damage) #we shouldn't need this
             else: await message.channel.send("Who are you?")
-    if (message.content.lower() == "roll"):
+    if message.content.lower() == "roll":
         if mode == "17": #if the last roll was 17 then don't roll
             await message.channel.send("Please choose whether to `heal` or `attack`.")
         elif mode == "clash": #keep clashing
-            await asyncio.gather(clash(message))
+            await clash(message)
         elif message.author.id == turn.id: #the person whose turn it is rolls
-            if (turn.id == p1.id and p2.hp - p1.hp >= 30): damage = random.randint(1, 30)
-            elif (turn.id == p2.id and p1.hp - p2.hp >= 30): damage = random.randint(1, 30)
+            if turn.id == p1.id and p2.hp - p1.hp >= 30: damage = random.randint(1, 30)
+            elif turn.id == p2.id and p1.hp - p2.hp >= 30: damage = random.randint(1, 30)
             else: damage = random.randint(1, 20)
             if turn == p1: 
                 p1.last = damage
@@ -179,22 +177,22 @@ async def fight(message): #called everytime fight is active, processes rolls.
                 other = p1
                 if p1.last == damage: #if p1's last is p2's current
                     mode = "clash"
-                    await asyncio.gather(clashstart(message, damage)) #doesn't reporthp, quits this function
+                    await clashstart(message, damage) #doesn't reporthp, quits this function
                     return
-            await asyncio.gather(processattack(message, damage))
+            await processattack(message, damage)
             if mode == "17": #not sure if this is needed
                 return
             other.hp -= damage
-            await asyncio.gather(reporthp(message, str(damage))) #The order in which these occur matters.
-            await asyncio.gather(checkstuff(message, damage)) #checks if game is over
+            await reporthp(message, str(damage)) #The order in which these occur matters.
+            await checkstuff(message, damage) #checks if game is over
             turn = other
             await message.channel.send("roll") #fegg attack, will remove later
 
-    if (message.content.lower() == "!quit" and (message.author.id == p1.id or message.author.id == p2.id)): #to abort the match
+    if message.content.lower() == "!quit" and (message.author.id == p1.id or message.author.id == p2.id): #to abort the match
         embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has been aborted.", description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
         embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||", inline=False)
         await message.channel.send(embed=embedVar) #match over and hp text
-        await asyncio.gather(reportstats(message))
+        await reportstats(message)
         fighting = False #stops the fight
         mode = ""
 
@@ -260,44 +258,44 @@ async def checkstuff(message, damage):
     if turn == p2:
         global fighting
         global mode
-        if (p1.hp <= 0 and p2.hp <= 0): #draw
+        if p1.hp <= 0 and p2.hp <= 0: #draw
             embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has ended in a draw.", description=(f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}"), color=0x00ff00)
             embedVar.add_field(name=("Please update your stats with a draw."), value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.", inline=False)
             await message.channel.send(embed=embedVar) #match over and hp text
-            await asyncio.gather(reportstats(message))
+            await reportstats(message)
             fighting = False #stops the fight
             mode = ""
-        elif (p1.hp <= 0 or p2.hp <= 0):
+        elif p1.hp <= 0 or p2.hp <= 0:
             embedVar = discord.Embed(title=f"The match between {p1.tag.name} and {p2.tag.name} has ended.", description=f"{p1.name} HP: {p1.hp}\n{p2.name} HP: {p2.hp}\nPlease update your stats and awards, and try to remember as I can't check all of them.", color=0x00ff00)
             await message.channel.send(embed=embedVar) #match over and hp text
-            await asyncio.gather(reportstats(message))
+            await reportstats(message)
             fighting = False
             mode = ""
-            if (p1.hp == 0 or p2.hp == 0):
+            if p1.hp == 0 or p2.hp == 0:
                 embedVar = discord.Embed(title=("You finished your opponent with the exact number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if (p1.hp <= -15 or p2.hp <= -15):
+            if p1.hp <= -15 or p2.hp <= -15:
                 embedVar = discord.Embed(title=("You finished your opponent to -15 HP!"), description="You may be eligible for an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if (p1.hp >= 30 or p2.hp >= 30):
+            if p1.hp >= 30 or p2.hp >= 30:
                 embedVar = discord.Embed(title=("You finished your opponent with 30 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if (p1.hp >= 50 or p2.hp >= 50):
+            if p1.hp >= 50 or p2.hp >= 50:
                 embedVar = discord.Embed(title=("You finished your opponent with 50 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if (p1.hp >= 70 or p2.hp >= 70):
+            if p1.hp >= 70 or p2.hp >= 70:
                 embedVar = discord.Embed(title=("You finished your opponent with 70 health left!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if ((p1.rolls[0] == 20 and p2.rolls[0] == 1) or (p2.rolls[0] == 20 and p2.rolls[0] == 1)):
+            if (p1.rolls[0] == 20 and p2.rolls[0] == 1) or (p2.rolls[0] == 20 and p2.rolls[0] == 1):
                 embedVar = discord.Embed(title=("Your first roll was a 20 and your opponent's was a miss!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if ((p1.rolls[-1] == luckies[p1.id]) or (p2.rolls[-1] == luckies[p2.id])):
+            if (p1.rolls[-1] == luckies[p1.id]) or (p2.rolls[-1] == luckies[p2.id]):
                 embedVar = discord.Embed(title=("You finished your opponent with your lucky number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-            if ((p1.rolls[-1] == 20) or (p2.rolls[-1] == 20)):
+            if (p1.rolls[-1] == 20) or (p2.rolls[-1] == 20):
                 embedVar = discord.Embed(title=("You finished your opponent with a special attack!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                 await message.channel.send(embed=embedVar)
-    if ((p1.hp >= 125) or (p2.hp >= 125)):
+    if (p1.hp >= 125) or (p2.hp >= 125):
             embedVar = discord.Embed(title=("You have over 125 health!"), description="You can get an award if you don't already have it.", color=0x00ff00)
             await message.channel.send(embed=embedVar)
 
@@ -311,7 +309,7 @@ async def clashstart(message, damage):
 
 #Processes clash rolls
 async def clash(message):
-    if (message.content.lower() == "roll"):
+    if message.content.lower() == "roll":
         global turn
         if message.author.id == turn.id:
             damage = random.randint(1, 100)
@@ -339,7 +337,7 @@ async def clash(message):
                     embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=f"The clash score is:\n{p1.name}: {p1.clash}\n{p2.name}: {p2.clash}", color=0x00ff00)
                     embedVar.set_thumbnail(url=(winner.avatar_url))
                     await message.channel.send(embed=embedVar)
-                    await asyncio.gather(reporthp(message, p1.last))
+                    await reporthp(message, p1.last)
                     mode = ""
                     p2.last = -1
                     turn = p1
