@@ -268,8 +268,11 @@ class MyClient(discord.Client):
                 if (self.p1.rolls[-1] == 20) or (self.p2.rolls[-1] == 20):
                     embedVar = discord.Embed(title=("You finished your opponent with a special attack!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
-        for i in {self.p1, self.p2}:
-            if i.rolls[-1] == i.rolls[-2] == i.rolls[-3]:
+        for i in {self.p1, self.p2}: #3 in a row
+            if i.rolls[-1] == i.rolls[-2] and i.rolls[-2] == i.rolls[-3]:
+                embedVar = discord.Embed(title=("You got three in a row!"), description="You get a bonus attack! You can also claim an award if you don't already have it :D", color=0x00ff00)
+                embedVar.set_author(name="Special Roll", icon_url=(self.turn.tag.avatar_url))
+                await message.channel.send(embed=embedVar)
                 self.turn = i
         if (self.p1.hp >= 125) or (self.p2.hp >= 125):
                 embedVar = discord.Embed(title=("You have over 125 health!"), description="You can get an award if you don't already have it.", color=0x00ff00)
