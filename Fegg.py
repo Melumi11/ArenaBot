@@ -1,5 +1,8 @@
 #-------------------------------import----------------------------------#
 import discord, logging, random#, asyncio
+from discord.ext import commands
+from discord_slash import SlashCommand
+from discord_slash.utils.manage_commands import create_option
 #-----------------------------------------------------------------------#
 
 #-------------------------------variables-------------------------------#
@@ -351,7 +354,31 @@ class Fighter: #Arena game player class
         def stats(self):
             return (f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
 
-client = MyClient()
+client = MyClient() #MyClient()
+slash = SlashCommand(client, sync_commands=True) # Declares slash commands through the client.
+
+#Roll
+@slash.slash(name="roll", description="Dice roll command, up to 999,999,999",
+             options=[create_option(
+                 name="d",
+                 description="Roll a d-sided die",
+                 option_type=3,
+                 required=True)])
+async def roll(ctx, d):
+    if len(d) < 17: #dice roll command (up to 999,999,999)
+        try:
+            await ctx.send(content=f"Roll d{d}: `[{str(random.randint(1, int(d)))}]`")
+        except: await ctx.send(content="Please enter a number between zero and one billion")
+
+@slash.slash(name="fight", description="Fight with another user according to the standard Arena rules.",
+             options=[create_option(
+                 name="Target",
+                 description="Ping someone to fight them.",
+                 option_type=3,
+                 required=True)])
+async def fight(target):
+    await client.startfight(target)
+
 #Launch bot
 with open('token.txt') as f:
     TOKEN = f.readline()
