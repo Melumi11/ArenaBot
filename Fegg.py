@@ -52,13 +52,13 @@ class MyClient(discord.Client):
                     self.fighting = True
                     await self.reporthp(message, "FORCERESUME")
             
-            elif message_lower.startswith("!roll d"): #dice roll command (up to 999)
+            elif message_lower.startswith("!roll d") and len(message_lower) < 17: #dice roll command (up to 999)
                 try:
-                    await message.channel.send(str(random.randint(1, int(message.content[7:]))))
+                    await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
                 except: pass
             
             elif message_lower == '!help': #help command
-                embedVar = discord.Embed(title="Hello", description="My name is Fegg. I am a bot coded by self.MELUMI#5395", color=0x00ff00)
+                embedVar = discord.Embed(title="Hello", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
                 embedVar.add_field(name=("List of commands:"), value="!help (this command)\n!fight (fight command for the Arena)\n!sweat (:colinsweat:)\n!roll (rolls a die, syntax: `!roll d20`)", inline=False)
                 await message.channel.send(embed=embedVar)
             
@@ -76,7 +76,7 @@ class MyClient(discord.Client):
                         else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
 
         elif 'kill me' in message_lower or ('i ' in message_lower and 'die' in message_lower): #suicide prevention
-            await message.channel.send("Please not worry. @everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
+            await message.channel.send("Please not worry. Everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
             await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
 
         elif 'parm' in message_lower: #parm
