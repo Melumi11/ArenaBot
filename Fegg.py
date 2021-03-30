@@ -30,9 +30,9 @@ class MyClient(discord.Client):
 
     #Reading messages
     async def on_message(self, message):
-        """if message.author == client.user: #so that the bot doesn't message itself
+        if message.author == client.user: #so that the bot doesn't message itself
             reself.turn
-        """
+        
         if self.fighting: #If people are self.fighting then we call fight
             await self.fight(message)
         
@@ -52,7 +52,7 @@ class MyClient(discord.Client):
                     self.fighting = True
                     await self.reporthp(message, "FORCERESUME")
             
-            elif message_lower.startswith("!roll d") and len(message_lower) < 17: #dice roll command (up to 999)
+            elif message_lower.startswith("!roll d") and len(message_lower) < 17: #dice roll command (up to 999,999,999)
                 try:
                     await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
                 except: pass
@@ -74,7 +74,7 @@ class MyClient(discord.Client):
                             self.luckies[message.author.id] = num
                             await message.channel.send("Your lucky number has been temporarily set as " + str(self.luckies[message.author.id]))
                         else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
-
+            
         elif 'kill me' in message_lower or ('i ' in message_lower and 'die' in message_lower): #suicide prevention
             await message.channel.send("Please not worry. Everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
             await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
