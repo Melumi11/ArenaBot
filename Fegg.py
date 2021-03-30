@@ -31,7 +31,7 @@ class MyClient(discord.Client):
     #Reading messages
     async def on_message(self, message):
         if message.author == client.user: #so that the bot doesn't message itself
-            reself.turn
+            return
         
         if self.fighting: #If people are self.fighting then we call fight
             await self.fight(message)
