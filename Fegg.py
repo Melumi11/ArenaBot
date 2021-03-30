@@ -52,14 +52,16 @@ class MyClient(discord.Client):
                     self.fighting = True
                     await self.reporthp(message, "FORCERESUME")
             
-            elif message_lower.startswith("!roll d") and len(message_lower) < 17: #dice roll command (up to 999,999,999)
-                try:
-                    await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
-                except: pass
+            elif message_lower.startswith("!roll d"):
+                if len(message_lower) < 17: #dice roll command (up to 999,999,999)
+                    try:
+                        await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
+                    except: await message.channel.send("Please enter a number between zero and one billion")
+                else: await message.channel.send("Please enter a number between zero and one billion")
             
             elif message_lower == '!help': #help command
                 embedVar = discord.Embed(title="Hello", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="!help (this command)\n!fight (fight command for the Arena)\n!sweat (:colinsweat:)\n!roll (rolls a die, syntax: `!roll d20`)", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`!fight` (fight command for the Arena)\n`!sweat` (:colinsweat:)\n`!roll` (rolls a die, syntax: `!roll d20`)\n`!roll d` (rolls a die between zero and one billion, for example `!roll d20`", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
