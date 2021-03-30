@@ -45,7 +45,7 @@ class MyClient(discord.Client):
                 if not self.fighting:
                     await self.startfight(message)
                 else: 
-                    await message.channel.send(f"There is already a fight going on between {self.p1.tag} and {self.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact self.MELUMI#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+                    await message.channel.send(f"There is already a fight going on between {self.p1.tag} and {self.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
 
             elif message_lower == '!sweat': #big sweat
                 await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
@@ -97,7 +97,7 @@ class MyClient(discord.Client):
             await message.channel.send("Please use `!fight @someone` if you want to fight them.") #if there is no mention, give error
         else: #self.fighting is still False
             if self.p1.id == self.p2.id:
-                await message.channel.send("You can't fight yourself.") #you can't fight yourself, and this also triggers if no mention
+                await message.channel.send("You can't fight yourself.")
                 self.fighting = False
             else: #try self.luckies, start fight
                 self.fighting = True
@@ -105,7 +105,7 @@ class MyClient(discord.Client):
                 try: #checks if the lucky numbers are registered
                     embedVar = discord.Embed(title=(f"**{self.p1.tag.name}** challenges **{self.p2.tag.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
                     embedVar.add_field(name=(f"**{self.p1.tag.name}**'s lucky number is {self.luckies[self.p1.id]} and **{self.p2.tag.name}**'s is {self.luckies[self.p2.id]}."), 
-                                        value=("Type `roll` to attack and `!quit` to stop self.fighting."), inline=False)
+                                        value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
                     embedVar.set_thumbnail(url=(message.author.avatar_url))
                     await message.channel.send(embed=embedVar)
                 except KeyError: #checks whose lucky number isn't registered
@@ -354,6 +354,8 @@ class Fighter: #Arena game player class
         def stats(self):
             return (f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
 
+
+#-----------------------------Slash Commands----------------------------#
 client = MyClient() #MyClient()
 slash = SlashCommand(client, sync_commands=True) # Declares slash commands through the client.
 
@@ -369,17 +371,46 @@ async def roll(ctx, d):
         try:
             await ctx.send(content=f"Roll d{d}: `[{str(random.randint(1, int(d)))}]`")
         except: await ctx.send(content="Please enter a number between zero and one billion")
-
+#Fight
 @slash.slash(name="fight", description="Fight with another user according to the standard Arena rules.",
              options=[create_option(
                  name="Target",
                  description="Ping someone to fight them.",
-                 option_type=3,
+                 option_type=6,
                  required=True)])
-async def fight(target):
-    await client.startfight(target)
+async def fight(ctx, target):
+    if not client.fighting:
+        client.turn = client.p1
+        client.p1.reset(ctx.author)
+        client.p2.reset(target)
+        if client.p1.id == client.p2.id:
+            await ctx.send("You can't fight yourself.")
+            client.fighting = False
+        else: #try self.luckies, start fight
+            client.fighting = True
+            client.mode = ""
+            try: #checks if the lucky numbers are registered
+                embedVar = discord.Embed(title=(f"**{client.p1.tag.name}** challenges **{client.p2.tag.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
+                embedVar.add_field(name=(f"**{client.p1.tag.name}**'s lucky number is {client.luckies[client.p1.id]} and **{client.p2.tag.name}**'s is {client.luckies[client.p2.id]}."), 
+                                    value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
+                embedVar.set_thumbnail(url=(ctx.author.avatar_url))
+                await ctx.send(embed=embedVar)
+            except KeyError: #checks whose lucky number isn't registered
+                try:
+                    client.luckies[client.p1.id] #checking to see both players' lucky numbers are registered
+                except KeyError:
+                    await ctx.send(f"Uh oh, {client.p1.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
+                    client.fighting = False
+                try:
+                    client.luckies[client.p2.id]
+                except KeyError:
+                    await ctx.send(f"Uh oh, {client.p2.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
+                    client.fighting = False
+    else: 
+        await ctx.send(f"There is already a fight going on between {client.p1.tag} and {client.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+#-----------------------------------------------------------------------#
 
-#Launch bot
+#-------------------------------Launch bot------------------------------#
 with open('token.txt') as f:
     TOKEN = f.readline()
 client.run(TOKEN)
