@@ -70,7 +70,7 @@ class MyClient(discord.Client):
                 else: 
                     if message.content[10:].isdigit():
                         num = message.content[10:]
-                        if 0 < num <= 20:
+                        if 0 < int(num) <= 20:
                             self.luckies[message.author.id] = num
                             await message.channel.send("Your lucky number has been temporarily set as " + str(self.luckies[message.author.id]))
                         else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
@@ -107,12 +107,12 @@ class MyClient(discord.Client):
                     try:
                         self.luckies[self.p1.id] #checking to see both players' lucky numbers are registered
                     except KeyError:
-                        await message.channel.send(f"Uh oh, {self.p1.name}'s lucky number is not in my database. Please ask {self.MELUMI} for help.")
+                        await message.channel.send(f"Uh oh, {self.p1.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
                         self.fighting = False
                     try:
                         self.luckies[self.p2.id]
                     except KeyError:
-                        await message.channel.send(f"Uh oh, {self.p2.name}'s lucky number is not in my database. Please ask {self.MELUMI} for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
+                        await message.channel.send(f"Uh oh, {self.p2.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
                         self.fighting = False
 
     async def fight(self, message): #called everytime fight is active, processes rolls.
@@ -152,9 +152,9 @@ class MyClient(discord.Client):
                 if self.turn.id == self.p1.id and self.p2.hp - self.p1.hp >= 30: self.damage = random.randint(1, 30)
                 elif self.turn.id == self.p2.id and self.p1.hp - self.p2.hp >= 30: self.damage = random.randint(1, 30)
                 else: self.damage = random.randint(1, 20)
+                self.turn.rolls.append(self.damage)
                 if self.turn == self.p1: 
                     self.p1.last = self.damage
-                    self.p1.rolls.append(self.damage)
                     self.other = self.p2
                 else: 
                     self.other = self.p1
@@ -167,9 +167,8 @@ class MyClient(discord.Client):
                     return
                 self.other.hp -= self.damage
                 await self.reporthp(message, str(self.damage)) #The order in which these occur matters.
-                await self.checkstuff(message, self.damage) #checks if game is over
+                await self.checkstuff(message) #checks if game is over
                 self.turn = self.other
-                await message.channel.send("roll") #fegg attack, will remove later
 
         if message.content.lower() == "!quit" and (message.author.id == self.p1.id or message.author.id == self.p2.id): #to abort the match
             embedVar = discord.Embed(title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has been aborted.", description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
@@ -269,7 +268,7 @@ class MyClient(discord.Client):
                     embedVar = discord.Embed(title=("You finished your opponent with a special attack!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
         for i in {self.p1, self.p2}: #3 in a row
-            if i.rolls[-1] == i.rolls[-2] and i.rolls[-2] == i.rolls[-3]:
+            if len(i.rolls) > 2 and i.rolls[-1] == i.rolls[-2] and i.rolls[-2] == i.rolls[-3]:
                 embedVar = discord.Embed(title=("You got three in a row!"), description="You get a bonus attack! You can also claim an award if you don't already have it :D", color=0x00ff00)
                 embedVar.set_author(name="Special Roll", icon_url=(self.turn.tag.avatar_url))
                 await message.channel.send(embed=embedVar)
@@ -290,6 +289,7 @@ class MyClient(discord.Client):
         if message.content.lower() == "roll":
             if message.author.id == self.turn.id:
                 self.damage = random.randint(1, 100)
+                winner = None #init winner
                 if self.damage == 1: #sets self.other person's clash score to 2 and says you lose
                     if self.turn.id == self.p1.id: self.p2.clash = 2
                     else: self.p1.clash = 2
@@ -297,7 +297,14 @@ class MyClient(discord.Client):
                 if self.damage == 100: #sets clash score to 2, mentions award
                     self.turn.clash = 2
                     await message.channel.send("You automatically win the clash. If you don't already have the award, please claim it now.")
-                if self.turn.id == self.p1.id:
+                
+                embedVar = discord.Embed(title=(f"{self.turn.tag.name} got a **{self.damage}**!!"), description=(f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}"), color=0x00ff00)
+                embedVar.set_author(name=(self.turn.tag.name + " roll"), icon_url=(self.turn.tag.avatar_url))
+                await message.channel.send(embed=embedVar) #Reports roll
+                if self.turn.id == self.p1.id: self.turn = self.p2
+                else: self.turn = self.p1
+
+                if not winner and self.turn.id == self.p1.id:
                     self.p2.last = self.damage #for checking who won the round 
                 else: #self.turn is self.p2, time to check stuff
                     if self.damage > self.p2.last:
@@ -308,10 +315,10 @@ class MyClient(discord.Client):
                         await message.channel.send("wtf you got the same number and idk what to do so I won't count this one")
                     if self.p1.clash >= 2: winner = self.p1
                     elif self.p2.clash >= 2: winner = self.p2
-                    if winner.clash >= 2: #winner text and stuff, quits function
+                    if winner and winner.clash >= 2: #winner text and stuff, quits function
                         winner.hp += self.p1.last
                         embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}", color=0x00ff00)
-                        embedVar.set_thumbnail(url=(winner.avatar_url))
+                        embedVar.set_thumbnail(url=(winner.tag.avatar_url))
                         await message.channel.send(embed=embedVar)
                         await self.reporthp(message, self.p1.last)
                         self.mode = ""
@@ -321,11 +328,6 @@ class MyClient(discord.Client):
                         winner = None
                         self.p1.clash, self.p2.clash = 0, 0
                         return
-                embedVar = discord.Embed(title=(f"{self.turn.tag.name} got a **{self.damage}**!!"), description=(f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}"), color=0x00ff00)
-                embedVar.set_author(name=(self.turn.tag.name + " roll"), icon_url=(self.turn.tag.avatar_url))
-                await message.channel.send(embed=embedVar) #Reports roll
-                if self.turn.id == self.p1.id: self.turn = self.p2
-                else: self.turn = self.p1
 
 class Fighter: #Arena game player class
         def reset(self, tag):
