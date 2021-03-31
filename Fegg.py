@@ -51,7 +51,7 @@ class MyClient(discord.Client):
                 await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
             elif message_lower == '!forceresume': #resumes fight if accidentally quit
-                if message.author.id in {self.p1.id, self.p2.id, self.MELUMI}:
+                if message.author.id in {self.p1.id, self.p2.id, self.MELUMI} and self.fighting == False:
                     self.fighting = True
                     await self.reporthp(message, "FORCERESUME")
             """
@@ -64,7 +64,7 @@ class MyClient(discord.Client):
             """
             if message_lower == '!help': #help command
                 embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||\n`!forceresume` (Try this if you ever accidentally quit a game)", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
