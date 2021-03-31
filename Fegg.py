@@ -156,11 +156,11 @@ class MyClient(discord.Client):
                 if self.turn.id == self.p1.id: self.other = self.p2 
                 else: self.other = self.p1 
                 #Rolling the dice:
-                if abs(self.turn.hp - self.other.hp) >= 30: 
+                if self.other.hp - self.turn.hp >= 30: 
                     await message.channel.send("Comeback rules activate! You roll a d30.")
                     self.damage = random.randint(1, 30)
-                if self.turn.hp <= 5 or self.other.hp <= 5:
-                    if abs(self.turn.hp - self.other.hp) >= 25: 
+                elif self.turn.hp <= 5:
+                    if self.other.hp - self.turn.hp >= 25: 
                         await message.channel.send("5HP comeback rules activate! You roll a d30.")
                         self.damage = random.randint(1, 30)
                 #normal:
