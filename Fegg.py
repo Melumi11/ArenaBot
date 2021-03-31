@@ -124,29 +124,28 @@ class MyClient(discord.Client):
         if self.mode == "17": #if the last roll was a 17
             if 'attack' in message.content.lower(): #attacks for 17
                 if message.author.id == self.turn.id:
-                    self.damage = 17
+                    self.damage = 17 #damage is 17
                     if self.turn.id == self.p1.id: self.other = self.p2 #Regular attacking biz
                     else: self.other = self.p1
                     self.other.hp -= self.damage
-                    await self.reporthp(message, str(self.damage)) #The order in which these occur matters.
-                    self.turn = self.other
+                    await self.reporthp(message, str(self.damage))
+                    self.turn = self.other #switch turns
                     await self.checkstuff(message, self.damage)
-                    self.mode = ""
+                    self.mode = "" #not 17 anymore
                 else: await message.channel.send("Who are you?")
             if 'heal' in message.content.lower(): #heals for 4d7
                 if message.author.id == self.turn.id:
-                    self.damage = random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7)
+                    self.damage = random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7) + random.randint(1, 7) #rolls 4d7
                     self.turn.seventeens += 1 #update stats
                     self.turn.hp += self.damage #heal
                     if self.turn.id == self.p1.id: self.other = self.p2
-                    else: self.other = self.p1
+                    else: self.other = self.p1 #finds other player
                     #Instead of self.reporthp
                     embedVar = discord.Embed(title=(f"{self.turn.tag.name} healed **{self.damage}** health!"), description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
                     embedVar.set_author(name=self.turn.tag.name, icon_url=(self.turn.tag.avatar_url))
                     await message.channel.send(embed=embedVar)
-                    self.mode = ""
-                    self.turn = self.other
-                    #await self.checkstuff(message, self.damage) #we shouldn't need this
+                    self.mode = "" #not 17 anymore
+                    self.turn = self.other #change turn
                 else: await message.channel.send("Who are you?")
         if message.content.lower() == "roll":
             if self.mode == "17": #if the last roll was 17 then don't roll
@@ -154,13 +153,23 @@ class MyClient(discord.Client):
             elif self.mode == "clash": #keep clashing
                 await self.clash(message)
             elif message.author.id == self.turn.id: #the person whose self.turn it is rolls
-                if self.turn.id == self.p1.id and self.p2.hp - self.p1.hp >= 30: self.damage = random.randint(1, 30)
-                elif self.turn.id == self.p2.id and self.p1.hp - self.p2.hp >= 30: self.damage = random.randint(1, 30)
+                if self.turn.id == self.p1.id: self.other = self.p2 
+                else: self.other = self.p1 
+                #Rolling the dice:
+                if abs(self.turn.hp - self.other.hp) >= 30: 
+                    await message.channel.send("Comeback rules activate! You roll a d30.")
+                    self.damage = random.randint(1, 30)
+                if self.turn.hp <= 5 or self.other.hp <= 5:
+                    if abs(self.turn.hp - self.other.hp) >= 25: 
+                        await message.channel.send("5HP comeback rules activate! You roll a d30.")
+                        self.damage = random.randint(1, 30)
+                #normal:
                 else: self.damage = random.randint(1, 20)
-                self.turn.rolls.append(self.damage)
+                
+                self.turn.rolls.append(self.damage) #Tracks every roll
                 if self.turn == self.p1: 
-                    self.p1.last = self.damage
-                    self.other = self.p2
+                    self.p1.last = self.damage #tracks last attack (do I need this? idk)
+                    self.other = self.p2 #probably don't need this but whatevs
                 else: 
                     self.other = self.p1
                     if self.p1.last == self.damage: #if self.p1's last is self.p2's current
