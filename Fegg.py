@@ -64,7 +64,7 @@ class MyClient(discord.Client):
             """
             if message_lower == '!help': #help command
                 embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
@@ -428,6 +428,7 @@ async def sweat(ctx):
 @slash.slash(name="setlucky", description="Temporarily set your lucky number.",
              options=[create_option(
                  name="Lucky",
+                 description="Choose a number between 1 and 20.",
                  option_type=4,
                  required=True)])
 async def roll(ctx, Lucky):
