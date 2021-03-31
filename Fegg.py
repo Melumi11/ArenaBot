@@ -71,14 +71,14 @@ class MyClient(discord.Client):
                 if message.author.id in self.luckies.keys():
                     await message.channel.send("Your lucky number is already set as " + str(self.luckies[message.author.id]))
                 elif len(message.content) <= 10:
-                    await message.channel.send("Please type the command like `!setlucky 1` or `!setlucky 11`")
+                    await message.channel.send("Please type the command like `!setlucky 1` or `!setlucky 11`. You can also use /setlucky for more help.")
                 else: 
                     if message.content[10:].isdigit():
                         num = message.content[10:]
                         if 0 < int(num) <= 20:
                             self.luckies[message.author.id] = num
-                            await message.channel.send("Your lucky number has been temporarily set as " + str(self.luckies[message.author.id]))
-                        else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`")
+                            await message.channel.send("Your lucky number has been set as " + str(self.luckies[message.author.id]) + " until the bot is restarted.")
+                        else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`. You can also use /setlucky for more help")
             
         elif 'kill me' in message_lower or ('i ' in message_lower and 'die' in message_lower): #suicide prevention
             await message.channel.send("Please not worry. Everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
@@ -423,6 +423,20 @@ async def fight(ctx, target):
 @slash.slash(name="sweat", description="For the Colin Cult big-sweaters")
 async def sweat(ctx):
     await ctx.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
+
+#Setlucky
+@slash.slash(name="setlucky", description="Temporarily set your lucky number.",
+             options=[create_option(
+                 name="Lucky",
+                 option_type=4,
+                 required=True)])
+async def roll(ctx, Lucky):
+    if ctx.author.id in client.luckies.keys():
+        await ctx.send("Your lucky number is already set as " + str(client.luckies[ctx.author.id]))
+    elif 1 <= Lucky <= 20:
+        client.luckies[ctx.author.id] = Lucky
+        await ctx.send("Your lucky number has been set as " + str(client.luckies[ctx.author.id]) + " until the bot is restarted.")
+    else: await ctx.send("Please choose a number between 1 and 20 (inclusive)")
 
 #-----------------------------------------------------------------------#
 
