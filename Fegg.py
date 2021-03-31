@@ -54,17 +54,17 @@ class MyClient(discord.Client):
                 if message.author.id in {self.p1.id, self.p2.id, self.MELUMI}:
                     self.fighting = True
                     await self.reporthp(message, "FORCERESUME")
-            
+            """
             elif message_lower.startswith("!roll d"):
                 if len(message_lower) < 17: #dice roll command (up to 999,999,999)
                     try:
                         await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
                     except: await message.channel.send("Please enter a number between zero and one billion")
                 else: await message.channel.send("Please enter a number between zero and one billion")
-            
-            elif message_lower == '!help': #help command
-                embedVar = discord.Embed(title="Hello", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`!fight` (fight command for the Arena)\n`!sweat` (:colinsweat:)\n`!roll` (rolls a die, syntax: `!roll d20`)\n`!roll d` (rolls a die between zero and one billion, for example `!roll d20`", inline=False)
+            """
+            if message_lower == '!help': #help command
+                embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
@@ -371,11 +371,12 @@ async def roll(ctx, d):
         try:
             await ctx.send(content=f"Roll d{d}: `[{str(random.randint(1, int(d)))}]`")
         except: await ctx.send(content="Please enter a number between zero and one billion")
+
 #Fight
 @slash.slash(name="fight", description="Fight with another user according to the standard Arena rules.",
              options=[create_option(
                  name="Target",
-                 description="Ping someone to fight them.",
+                 description="Please @ the user who you would like to fight with.",
                  option_type=6,
                  required=True)])
 async def fight(ctx, target):
@@ -408,6 +409,12 @@ async def fight(ctx, target):
                     client.fighting = False
     else: 
         await ctx.send(f"There is already a fight going on between {client.p1.tag} and {client.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+
+#Sweat
+@slash.slash(name="sweat", description="For the Colin Cult big-sweaters")
+async def sweat(ctx):
+    await ctx.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
+
 #-----------------------------------------------------------------------#
 
 #-------------------------------Launch bot------------------------------#
