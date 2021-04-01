@@ -156,6 +156,7 @@ class MyClient(discord.Client):
                 if self.turn.id == self.p1.id: self.other = self.p2 
                 else: self.other = self.p1 
                 #Rolling the dice:
+                if self.turn.id == self.p2.id: self.p2.hp += self.p1.last #WARNING IDK IF THIS WILL WORK
                 if self.other.hp - self.turn.hp >= 30: 
                     await message.channel.send("Comeback rules activate! You roll a d30.")
                     self.damage = random.randint(1, 30)
@@ -165,7 +166,8 @@ class MyClient(discord.Client):
                         self.damage = random.randint(1, 30)
                 #normal:
                 else: self.damage = random.randint(1, 20)
-                
+                if self.turn.id == self.p2.id: self.p2.hp -= self.p1.last #END OF WARNING
+
                 self.turn.rolls.append(self.damage) #Tracks every roll
                 if self.turn == self.p1: 
                     self.p1.last = self.damage #tracks last attack (do I need this? idk)
@@ -259,6 +261,9 @@ class MyClient(discord.Client):
                 self.mode = ""
                 if self.p1.hp == 0 or self.p2.hp == 0:
                     embedVar = discord.Embed(title=("You finished your opponent with the exact number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
+                    await message.channel.send(embed=embedVar)
+                if self.p1.hp == 1 or self.p2.hp == 1:
+                    embedVar = discord.Embed(title=("You finished your opponent with 1 HP remaining!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
                 if self.p1.hp <= -15 or self.p2.hp <= -15:
                     embedVar = discord.Embed(title=("You finished your opponent to -15 HP!"), description="You may be eligible for an award if you don't already have it.", color=0x00ff00)
