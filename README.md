@@ -23,11 +23,10 @@
 
 ### Features:
 
-- **Dark/Light** mode, you can toggle them and It'll be saved in local store
--   **Clock and Date** format can be set to 24 hour (default) or 12 hour
--   **Greetings** are easy to change and modify
--   **Variables** for custom colors in the `css` code
--   **Modular** javascript files for an easy read
+-   **Slash Commands** they're super cool and fancy
+-   **Epic Commands** like /sweat and /roll
+-   **Parm** ████████
+-   **Add more here** 
 
 ### Notes:
 This bot was created for a discord server that I am a part of called "The ARENA" where I and some friends do roleplay fights.
