@@ -23,15 +23,15 @@
 
 ### Features:
 
--   **Slash Commands** they're super cool and fancy
--   **Epic Commands** like /sweat and /roll
--   **Parm** ████████
--   **Add more here** 
+-   **Slash Commands** - they're super cool and fancy
+-   **Epic Commands** - like /sweat and /roll
+-   **Parm** - ████████
+-   **Suports Concurrent Fights** - Two fights can be fought at the same time
 
 ### Notes:
 This bot was created for a discord server that I am a part of called "The ARENA" where I and some friends do roleplay fights.
 
-These fight rules were written by Stealth and/or the folks/my friends from The ARENA.
+These fight rules were written by StealthMsopz and the folks from The ARENA.
 
 # Fight Rules:
 ### Base Rules:
@@ -149,6 +149,7 @@ These fight rules were written by Stealth and/or the folks/my friends from The A
 **Clash 100** - Roll a 100 during a clash for an instant clash win.
 
 **Punisher** - Roll a 30 using a d30.
+
 
 
 ### Stats Template:
