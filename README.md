@@ -31,7 +31,7 @@
 ### Notes:
 This bot was created for a discord server that I am a part of called "The ARENA" where I and some friends do roleplay fights.
 
-These fight rules were written by StealthMsopz#9785
+These fight rules were written by Stealth and/or the folks/my friends from The ARENA.
 
 # Fight Rules:
 ### Base Rules:
@@ -76,12 +76,9 @@ These fight rules were written by StealthMsopz#9785
 - Situations like forgetting that 17s can be used for healing are considered as mistakes and not invalidations.
 - In some cases, battles and stats earned from said battles will be invalidated. Also, remember that both players roll at the same time, so there is no need for both players to reroll if only one made a mistake.
 - Please do not delete rolls illegally and make sure to get both player's permission before making deleting, rewinding, restarting, etc.
-- Reworded: https://discord.com/channels/796135012927668234/796135012927668237/806592162011152434
-
 
 ### Other Notes:
 - Do not forfeit. If you forfeit the battle will be invalidated and you will wear the hat of shame.
-- Please read the rules before you ping me. I believe in you. (Rules may be updated. Check #announcements for major updates.)
 - Don’t be afraid to ask questions. If you qualify for an award, feel free to write it down.
 - Tip: Before deciding to heal or damage using a 17 roll, see what the opponent rolls first. Both players roll at the same time, so making a decision before your opponent moves can put you at a disadvantage.
 - Specials are currently 20s (or 30s), but as of now are only for show. Unique attributes or other aspects for specials may be added in the future.
