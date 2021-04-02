@@ -23,8 +23,8 @@
 
 ### Features:
 
--   **Slash Commands** - they're super cool and fancy
--   **Epic Commands** - like /sweat and /roll
+-   **Slash Commands** - They're super cool and fancy
+-   **Epic Commands** - Like /sweat and /roll
 -   **Parm** - ████████
 -   **Suports Concurrent Fights** - Two fights can be fought at the same time
 
