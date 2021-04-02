@@ -49,7 +49,7 @@ class MyClient(discord.Client):
 
             elif message_lower == '!help': #help command
                 embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
@@ -406,7 +406,7 @@ async def fight(ctx, target):
     await ctx.send(embed=embedVar)
 
 #Sweat
-@slash.slash(name="sweat", description="For the Colin Cult big-sweaters")
+@slash.slash(name="sweat", description=":colinsweat:")
 async def sweat(ctx):
     await ctx.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
@@ -438,3 +438,7 @@ client.run(TOKEN)
 #await asyncio.sleep(10)
 #reply:
 #await message.channel.reply('Hello!', mention_author=False)
+
+#Very cool debug command that stops the script and shows all variables, can resume after
+#import code
+#code.interact(local=locals())
