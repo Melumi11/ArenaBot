@@ -1,12 +1,40 @@
 <div align="center">
 <h1>Fegg: a multiplayer roleplay fighting discord bot</h1>
 </div>
+
 ![](https://github.com/Melumi11/Fegg/blob/main/demo.png)
 
+### Index
 
+-   [Fegg](#)
+    -   [Features](#features)
+    -   [Notes](#notes)
+    -   [Fight Rules](#fight-rules)
+         - [Base Rules](#base-rules)
+         - [Number Rules](#number-rules)
+         - [Comeback Rules](#comeback-rules)
+         - [Clash Rules](#clash-rules)
+         - [Draw Rules](#draw-rules)
+         - [Stat Notes](#stat-notes)
+         - [Invalidation Notes](#invalidation-notes)
+         - [Other Notes](#other-notes)
+         - [Battle Awards](#battle-awards)
+         - [Stats Template](#stats-template)
+
+### Features:
+
+- **Dark/Light** mode, you can toggle them and It'll be saved in local store
+-   **Clock and Date** format can be set to 24 hour (default) or 12 hour
+-   **Greetings** are easy to change and modify
+-   **Variables** for custom colors in the `css` code
+-   **Modular** javascript files for an easy read
+
+### Notes:
 This bot was created for a discord server that I am a part of called "The ARENA" where I and some friends do roleplay fights.
 
-# Fight rules:
+These fight rules were written by StealthMsopz#9785
+
+# Fight Rules:
 ### Base Rules:
 - Players start with 100 HP. (You can be at more than 100 HP.)
 - Each round both players roll a 20 sided die. (!roll d20)
@@ -63,38 +91,39 @@ This bot was created for a discord server that I am a part of called "The ARENA"
 - If a player is able to use a d30 or a d40, they may still decide to use a d20.
 - Clashes started with lucky numbers or 20s count towards stats for both players. This includes 1s, even though 1s cannot start clashes. For 17s, however, you must win the clash to use a 17 heal and have it count towards stats.
 
-### Battle Awards: (Feel free to suggest awards and keep your eyes open in case you qualify for one.)
+### Battle Awards: 
+(Feel free to suggest awards and keep your eyes open in case you qualify for one.)
 
-1 HP - Win a fight at 1 HP.
-Exact Elimination - Finish an opponent with the exact number.
-Opening Gambit - Roll a 20 while the opponent rolls a 1 on the first turn.
-Opening Clasher - Win a clash on the first turn of a fight.
-Draw Clasher I - Win a draw clash.
-Draw Clasher II - Win 3 draw clashes.
-Draw Clasher III - Win 5 draw clashes.
-Draw Clasher IV - Win 10 draw clashes.
-Overkill - Win and get an opponent to -15 HP or lower.
-Special Finisher - Finish an opponent with a 20 roll.
-Clash Finisher - Finish an opponent with a clash. (Does not apply to Draw Clashes.)
-Lucky Finisher - Finish an opponent with your lucky number.
-Unwavering - Win after a comeback rule was activated earlier in the fight. 
-Determination - Win after the opponent had 50 HP or more than you earlier in the fight.
-Threefold - Roll a number three times in a row.
-Fourfold - Roll a number four times in a row.
-Fivefold - Roll a number five times in a row.
-Karma - Roll three 1s in a row.
-Berserker - Roll three 20s in a row.
-Frenzy - Win 3 times in a row.
-Slaughter - Win 5 times in a row.
-Massacre - Win 10 times in a row.
-Untouchable - Win a fight at 30 HP or more.
-Invincible - Win a fight at 50 HP or more.
-Immortal - Win a fight at 70 HP or more.
-Life Saver - Reach 125 HP or more.
-Unyielding - Heal yourself using a 17 roll or a lucky number in the face of death.
-Undying - Win after healing yourself using a 17 roll or a lucky number in the face of death.
-Clash 100 - Roll a 100 during a clash for an instant clash win.
-Punisher - Roll a 30 using a d30.
+**1 HP** - Win a fight at 1 HP.
+**Exact Elimination** - Finish an opponent with the exact number.
+**Opening Gambit** - Roll a 20 while the opponent rolls a 1 on the first turn.
+**Opening Clasher** - Win a clash on the first turn of a fight.
+**Draw Clasher I** - Win a draw clash.
+**Draw Clasher II** - Win 3 draw clashes.
+**Draw Clasher III** - Win 5 draw clashes.
+**Draw Clasher IV** - Win 10 draw clashes.
+**Overkill** - Win and get an opponent to -15 HP or lower.
+**Special Finisher** - Finish an opponent with a 20 roll.
+**Clash Finisher** - Finish an opponent with a clash. (Does not apply to Draw Clashes.)
+**Lucky Finisher** - Finish an opponent with your lucky number.
+**Unwavering** - Win after a comeback rule was activated earlier in the fight. 
+**Determination** - Win after the opponent had 50 HP or more than you earlier in the fight.
+**Threefold** - Roll a number three times in a row.
+**Fourfold** - Roll a number four times in a row.
+**Fivefold** - Roll a number five times in a row.
+**Karma** - Roll three 1s in a row.
+**Berserker** - Roll three 20s in a row.
+**Frenzy** - Win 3 times in a row.
+**Slaughter** - Win 5 times in a row.
+**Massacre** - Win 10 times in a row.
+**Untouchable** - Win a fight at 30 HP or more.
+**Invincible** - Win a fight at 50 HP or more.
+**Immortal** - Win a fight at 70 HP or more.
+**Life Saver** - Reach 125 HP or more.
+**Unyielding** - Heal yourself using a 17 roll or a lucky number in the face of death.
+**Undying** - Win after healing yourself using a 17 roll or a lucky number in the face of death.
+**Clash 100** - Roll a 100 during a clash for an instant clash win.
+**Punisher** - Roll a 30 using a d30.
 
 
 ### Stats Template:
