@@ -95,51 +95,94 @@ These fight rules were written by StealthMsopz#9785
 (Feel free to suggest awards and keep your eyes open in case you qualify for one.)
 
 **1 HP** - Win a fight at 1 HP.
+
 **Exact Elimination** - Finish an opponent with the exact number.
+
 **Opening Gambit** - Roll a 20 while the opponent rolls a 1 on the first turn.
+
 **Opening Clasher** - Win a clash on the first turn of a fight.
+
 **Draw Clasher I** - Win a draw clash.
+
 **Draw Clasher II** - Win 3 draw clashes.
+
 **Draw Clasher III** - Win 5 draw clashes.
+
 **Draw Clasher IV** - Win 10 draw clashes.
+
 **Overkill** - Win and get an opponent to -15 HP or lower.
+
 **Special Finisher** - Finish an opponent with a 20 roll.
+
 **Clash Finisher** - Finish an opponent with a clash. (Does not apply to Draw Clashes.)
+
 **Lucky Finisher** - Finish an opponent with your lucky number.
+
 **Unwavering** - Win after a comeback rule was activated earlier in the fight. 
+
 **Determination** - Win after the opponent had 50 HP or more than you earlier in the fight.
+
 **Threefold** - Roll a number three times in a row.
+
 **Fourfold** - Roll a number four times in a row.
+
 **Fivefold** - Roll a number five times in a row.
+
 **Karma** - Roll three 1s in a row.
+
 **Berserker** - Roll three 20s in a row.
+
 **Frenzy** - Win 3 times in a row.
+
 **Slaughter** - Win 5 times in a row.
+
 **Massacre** - Win 10 times in a row.
+
 **Untouchable** - Win a fight at 30 HP or more.
+
 **Invincible** - Win a fight at 50 HP or more.
+
 **Immortal** - Win a fight at 70 HP or more.
+
 **Life Saver** - Reach 125 HP or more.
+
 **Unyielding** - Heal yourself using a 17 roll or a lucky number in the face of death.
+
 **Undying** - Win after healing yourself using a 17 roll or a lucky number in the face of death.
+
 **Clash 100** - Roll a 100 during a clash for an instant clash win.
+
 **Punisher** - Roll a 30 using a d30.
 
 
 ### Stats Template:
 
 Stats: (Name)
+
 Special:
+
 Weapon:
+
 Lucky Number: (Can't be 1, 17, 20 or another player's number.)
 
+
+
 Total Games:
+
 Wins:
+
 Losses:
+
 Draws:
 
+
+
 1s Rolled:
+
 20s Rolled:
+
 Lucky Numbers Rolled:
+
 17 Heals Used:
+
 Clash Wins:
