@@ -1,5 +1,5 @@
 #-------------------------------import----------------------------------#
-import discord, logging, random#, asyncio
+import discord, logging, random, code#, asyncio
 from discord.ext import commands
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.ERROR)
 class MyClient(discord.Client):
     #-------------------------------"Global" Variables:-------------------------------#
     #Lucky numbers of the members in the Arena, as a dictionary
-    luckies = {822474721525628979: 1, 259716396198395904: 2, 543857545278783520: 3, 400514653957914635: 4, 246080207704817664: 5, 567819726013726722: 6, 332711880831270912: 7, 320559692269223938: 8, 194310041900154880: 9, 548617575282769922: 10, 640714673045504020: 11, 175824478423482368: 13, 294736827946893313: 16, 748751242003611739: 18, 731368690364186634: 19}
+    luckies = {806226322405720185: 1, 259716396198395904: 2, 543857545278783520: 3, 400514653957914635: 4, 246080207704817664: 5, 567819726013726722: 6, 332711880831270912: 7, 320559692269223938: 8, 194310041900154880: 9, 548617575282769922: 10, 640714673045504020: 11, 175824478423482368: 13, 294736827946893313: 16, 748751242003611739: 18, 731368690364186634: 19}
     MELUMI = 640714673045504020 #my discord id
     #For fight game:
     current_fighters = []
@@ -31,7 +31,6 @@ class MyClient(discord.Client):
         activity = discord.Activity(type=discord.ActivityType.competing, name="the Arena") #Playing, Listening to, Watching, also streaming, competing
         await client.change_presence(activity=activity)
         print(f'We have logged in as {self.user}')
-
 
     #Reading messages
     async def on_message(self, message):
@@ -115,7 +114,7 @@ class FightClass():
                     self.other.hp -= self.damage
                     await self.reporthp(message, str(self.damage))
                     self.turn = self.other #switch turns
-                    await self.checkstuff(message, self.damage)
+                    await self.checkstuff(message)
                     self.mode = "" #not 17 anymore
                 else: await message.channel.send("Who are you?")
             if 'heal' in message.content.lower(): #heals for 4d7
@@ -291,48 +290,49 @@ class FightClass():
 
     #Processes clash rolls
     async def clash(self, message):
-        if message.content.lower() == "roll":
-            if message.author.id == self.turn.id:
-                self.damage = random.randint(1, 100)
-                winner = None #init winner
-                if self.damage == 1: #sets self.other person's clash score to 2 and says you lose
-                    if self.turn.id == self.p1.id: self.p2.clash = 2
-                    else: self.p1.clash = 2
-                    await message.channel.send("You automatically lose the clash. oof.")
-                if self.damage == 100: #sets clash score to 2, mentions award
-                    self.turn.clash = 2
-                    await message.channel.send("You automatically win the clash. If you don't already have the award, please claim it now.")
-                
-                embedVar = discord.Embed(title=(f"{self.turn.tag.name} got a **{self.damage}**!!"), description=(f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}"), color=0x00ff00)
-                embedVar.set_author(name=(self.turn.tag.name + " roll"), icon_url=(self.turn.tag.avatar_url))
-                await message.channel.send(embed=embedVar) #Reports roll
-                if self.turn.id == self.p1.id: self.turn = self.p2
-                else: self.turn = self.p1
+        if message.author.id == self.turn.id:
+            #code.interact(local=locals())
+            self.damage = random.randint(1, 100)
+            winner = None #init winner
+            if self.damage == 1: #sets self.other person's clash score to 2 and says you lose
+                if self.turn.id == self.p1.id: self.p2.clash = 2
+                else: self.p1.clash = 2
+                await message.channel.send("You automatically lose the clash. oof.")
+            if self.damage == 100: #sets clash score to 2, mentions award
+                self.turn.clash = 2
+                await message.channel.send("You automatically win the clash. If you don't already have the award, please claim it now.")
 
-                if not winner and self.turn.id == self.p1.id:
-                    self.p2.last = self.damage #for checking who won the round 
-                else: #self.turn is self.p2, time to check stuff
-                    if self.damage > self.p2.last:
-                        self.p2.clash += 1 #checks who won the clash
-                    elif self.damage < self.p2.last:
-                        self.p1.clash += 1
-                    else:
-                        await message.channel.send("wtf you got the same number and idk what to do so I won't count this one")
-                    if self.p1.clash >= 2: winner = self.p1
-                    elif self.p2.clash >= 2: winner = self.p2
-                    if winner and winner.clash >= 2: #winner text and stuff, quits function
-                        winner.hp += self.p1.last
-                        embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}", color=0x00ff00)
-                        embedVar.set_thumbnail(url=(winner.tag.avatar_url))
-                        await message.channel.send(embed=embedVar)
-                        await self.reporthp(message, self.p1.last)
-                        self.mode = ""
-                        self.p2.last = -1
-                        self.turn = self.p1
-                        winner.clashwins += 1
-                        winner = None
-                        self.p1.clash, self.p2.clash = 0, 0
-                        return
+            if not winner and self.turn.id == self.p1.id: #cuz turn is backwards
+                self.p2.last = self.damage #for checking who won the round 
+            else: #self.turn is self.p2, time to check stuff
+                if self.damage > self.p2.last:
+                    self.p2.clash += 1 #checks who won the clash
+                elif self.damage < self.p2.last:
+                    self.p1.clash += 1
+                else:
+                    await message.channel.send("wtf you got the same number and idk what to do so I won't count this one")
+                if self.p1.clash >= 2: winner = self.p1
+                elif self.p2.clash >= 2: winner = self.p2
+                if winner and winner.clash >= 2: #winner text and stuff, quits function
+                    await message.channel.send(f"{self.turn.tag.name} got a **{self.damage}**!!")
+                    winner.hp += self.p1.last
+                    embedVar = discord.Embed(title=(winner.tag.name + " won the clash!"), description=f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}", color=0x00ff00)
+                    embedVar.set_thumbnail(url=(winner.tag.avatar_url))
+                    await message.channel.send(embed=embedVar)
+                    await self.reporthp(message, self.p1.last)
+                    self.mode = ""
+                    self.p2.last = -1
+                    self.turn = self.p1
+                    winner.clashwins += 1
+                    winner = None
+                    self.p1.clash, self.p2.clash = 0, 0
+                    return
+
+            embedVar = discord.Embed(title=(f"{self.turn.tag.name} got a **{self.damage}**!!"), description=(f"The clash score is:\n{self.p1.name}: {self.p1.clash}\n{self.p2.name}: {self.p2.clash}"), color=0x00ff00)
+            embedVar.set_author(name=(self.turn.tag.name + " roll"), icon_url=(self.turn.tag.avatar_url))
+            await message.channel.send(embed=embedVar) #Reports roll
+            if self.turn.id == self.p1.id: self.turn = self.p2
+            else: self.turn = self.p1
 
     def endfight(self):
         client.current_fighters.remove(self.p1.id)
