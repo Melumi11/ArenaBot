@@ -28,9 +28,9 @@ class MyClient(discord.Client):
     #----------------------------------------------------------------------------------#
     #Launch text in terminal
     async def on_ready(self): #login text, init fighters, self.turn = self.p1
+        activity = discord.Activity(type=discord.ActivityType.competing, name="the Arena") #Playing, Listening to, Watching, also streaming, competing
+        await client.change_presence(activity=activity)
         print(f'We have logged in as {self.user}')
-        activity = discord.Game("with the Fleggs")
-        await client.change_presence(status=discord.Status.idle, activity=activity)
 
 
     #Reading messages
