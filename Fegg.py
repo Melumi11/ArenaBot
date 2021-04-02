@@ -13,58 +13,43 @@ PLAYERHP = 100 #Starting health for both players
 #Logging errors
 logging.basicConfig(level=logging.ERROR)
 #logging.basicConfig(level=logging.CRITICAL)
-#logging.basicConfig(level=logging.WARNING) #Errors and stuff show in the terminal
+#logging.basicConfig(level=logging.WARNING) #Only the first one is actually used lol, me dum
 
+
+#Handles main text reading and stuff
 class MyClient(discord.Client):
     #-------------------------------"Global" Variables:-------------------------------#
     #Lucky numbers of the members in the Arena, as a dictionary
     luckies = {822474721525628979: 1, 259716396198395904: 2, 543857545278783520: 3, 400514653957914635: 4, 246080207704817664: 5, 567819726013726722: 6, 332711880831270912: 7, 320559692269223938: 8, 194310041900154880: 9, 548617575282769922: 10, 640714673045504020: 11, 175824478423482368: 13, 294736827946893313: 16, 748751242003611739: 18, 731368690364186634: 19}
-    fighting = False #for the Arena game
-    mode = ""
     MELUMI = 640714673045504020 #my discord id
+    #For fight game:
+    current_fighters = []
+    current_fights = []
     #----------------------------------------------------------------------------------#
     #Launch text in terminal
     async def on_ready(self): #login text, init fighters, self.turn = self.p1
         print(f'We have logged in as {self.user}')
-        #Initialize players
-        self.p1 = Fighter()
-        self.p2 = Fighter()
-        self.turn = self.p1
 
     #Reading messages
     async def on_message(self, message):
         if message.author == client.user: #so that the bot doesn't message itself
             return
         
-        if self.fighting: #If people are self.fighting then we call fight
-            await self.fight(message)
-        
+        #Going through the fight functions
+        try:
+            for i in range((len(self.current_fights))):
+                await self.current_fights[i].fight(message)
+        except IndexError:
+            for i in range((len(self.current_fights))):
+                await self.current_fights[i].fight(message)
+
         message_lower = message.content.lower() #converts message to lowercase (cuz it's used a lot)
         if message_lower.startswith('!'): 
-            if message_lower.startswith("!fight"): #begin fight if no one is self.fighting
-                if not self.fighting:
-                    await self.startfight(message)
-                else: 
-                    await message.channel.send(f"There is already a fight going on between {self.p1.tag} and {self.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+            if message_lower == '!sweat': await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
-            elif message_lower == '!sweat': #big sweat
-                await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
-
-            elif message_lower == '!forceresume': #resumes fight if accidentally quit
-                if message.author.id in {self.p1.id, self.p2.id, self.MELUMI} and self.fighting == False:
-                    self.fighting = True
-                    await self.reporthp(message, "FORCERESUME")
-            """
-            elif message_lower.startswith("!roll d"):
-                if len(message_lower) < 17: #dice roll command (up to 999,999,999)
-                    try:
-                        await message.channel.send(f"{message.author.name} Roll: `[{str(random.randint(1, int(message.content[7:])))}]`")
-                    except: await message.channel.send("Please enter a number between zero and one billion")
-                else: await message.channel.send("Please enter a number between zero and one billion")
-            """
-            if message_lower == '!help': #help command
+            elif message_lower == '!help': #help command
                 embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena) ||Also `!fight`||\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces) ||`!roll d` command removed||\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||\n`!forceresume` (Try this if you ever accidentally quit a game)", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (:colinsweat:) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
@@ -79,48 +64,45 @@ class MyClient(discord.Client):
                             self.luckies[message.author.id] = num
                             await message.channel.send("Your lucky number has been set as " + str(self.luckies[message.author.id]) + " until the bot is restarted.")
                         else: await message.channel.send("Please use a number between 1 and 20 such as `!setlucky 11`. You can also use /setlucky for more help")
-            
-        elif 'kill me' in message_lower or ('i ' in message_lower and 'die' in message_lower): #suicide prevention
-            await message.channel.send("Please not worry. Everyone is here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/")
-            await message.author.send('Please do not worry. We are here to help. If you are suicidal, you can find help at: https://suicidepreventionlifeline.org/')
+
+            elif message_lower.startswith("!fight"): await message.channel.send("please use `/fight` if you would like to fight.")
 
         elif 'parm' in message_lower: #parm
             await message.channel.send("https://images.heb.com/is/image/HEBGrocery/000081264")
+            await message.author.send("https://images.heb.com/is/image/HEBGrocery/000081264")
 
-    async def startfight(self, message): #called when a fight starts
-        #self.fighting is still false
+class Fighter: #Arena game player class
+        def __init__(self, tag):
+            self.tag = tag #discord tag
+            self.id = self.tag.id #the long number
+            #self.name = "<@" +str(self.id) + ">" #<@numbers>
+            self.name = self.tag.name
+            self.hp = PLAYERHP #100 by default, set at top
+            self.ones = 0
+            self.twenties = 0
+            self.luckies = 0
+            self.seventeens = 0
+            self.clashwins = 0
+
+            self.last = -1
+            self.clash = 0
+            self.rolls = []
+
+        def stats(self):
+            return (f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
+
+class FightClass():
+    def __init__(self, sender, target):
+        self.mode = ""
+        self.p1 = Fighter(sender)
+        self.p2 = Fighter(target)
         self.turn = self.p1
-        self.p1.reset(message.author)#initiates player 1 with PLAYERHP
-        try:
-            self.p2.reset(message.mentions[0]) #inits player 2 the same way
-        except IndexError:
-            await message.channel.send("Please use `!fight @someone` if you want to fight them.") #if there is no mention, give error
-        else: #self.fighting is still False
-            if self.p1.id == self.p2.id:
-                await message.channel.send("You can't fight yourself.")
-                self.fighting = False
-            else: #try self.luckies, start fight
-                self.fighting = True
-                self.mode = ""
-                try: #checks if the lucky numbers are registered
-                    embedVar = discord.Embed(title=(f"**{self.p1.tag.name}** challenges **{self.p2.tag.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
-                    embedVar.add_field(name=(f"**{self.p1.tag.name}**'s lucky number is {self.luckies[self.p1.id]} and **{self.p2.tag.name}**'s is {self.luckies[self.p2.id]}."), 
-                                        value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
-                    embedVar.set_thumbnail(url=(message.author.avatar_url))
-                    await message.channel.send(embed=embedVar)
-                except KeyError: #checks whose lucky number isn't registered
-                    try:
-                        self.luckies[self.p1.id] #checking to see both players' lucky numbers are registered
-                    except KeyError:
-                        await message.channel.send(f"Uh oh, {self.p1.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
-                        self.fighting = False
-                    try:
-                        self.luckies[self.p2.id]
-                    except KeyError:
-                        await message.channel.send(f"Uh oh, {self.p2.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
-                        self.fighting = False
 
-    async def fight(self, message): #called everytime fight is active, processes rolls.
+    #Reading Messages, called by client class
+    async def fight(self, message): #Fight method
+        if message.author == client.user: #so that the bot doesn't message itself
+            return
+
         if self.mode == "17": #if the last roll was a 17
             if 'attack' in message.content.lower(): #attacks for 17
                 if message.author.id == self.turn.id:
@@ -147,6 +129,7 @@ class MyClient(discord.Client):
                     self.mode = "" #not 17 anymore
                     self.turn = self.other #change turn
                 else: await message.channel.send("Who are you?")
+        
         if message.content.lower() == "roll":
             if self.mode == "17": #if the last roll was 17 then don't roll
                 await message.channel.send("Please choose whether to `heal` or `attack`.")
@@ -191,8 +174,8 @@ class MyClient(discord.Client):
             embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||", inline=False)
             await message.channel.send(embed=embedVar) #match over and hp text
             await self.reportstats(message)
-            self.fighting = False #stops the fight
             self.mode = ""
+            self.endfight() #END THE FIGHT
 
     #called when game ends
     async def reportstats(self, message):
@@ -212,13 +195,13 @@ class MyClient(discord.Client):
             await message.channel.send(embed=embedVar)
             self.turn.ones += 1
             self.damage = 0
-        elif dmg == self.luckies[self.turn.id]: #heals 10HP, updates stats
+        elif dmg == client.luckies[self.turn.id]: #heals 10HP, updates stats
             embedVar = discord.Embed(title=("You got your lucky number!"), description="You heal 10HP.", color=0x00ff00)
             embedVar.set_author(name="Special Roll", icon_url=(self.turn.tag.avatar_url))
             await message.channel.send(embed=embedVar)
             self.turn.hp += 10
             self.turn.luckies += 1
-            self.damage = self.luckies[self.turn.id]
+            self.damage = client.luckies[self.turn.id]
         elif dmg == 17: #sets self.mode to 17, self.damage 0
             embedVar = discord.Embed(title=("You got a 17!"), description="Would you like to `heal` or `attack`?\n(Attacking does 17 damage and healing rolls a 4d7.\nStats are only updated if you choose to heal.", color=0x00ff00)
             embedVar.set_author(name="Special Roll", icon_url=(self.turn.tag.avatar_url))
@@ -251,13 +234,12 @@ class MyClient(discord.Client):
                 embedVar.add_field(name=("Please update your stats with a draw."), value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.", inline=False)
                 await message.channel.send(embed=embedVar) #match over and hp text
                 await self.reportstats(message)
-                self.fighting = False #stops the fight
+                self.endfight() #END THE FIGHT
                 self.mode = ""
             elif self.p1.hp <= 0 or self.p2.hp <= 0:
                 embedVar = discord.Embed(title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended.", description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nPlease update your stats and awards, and try to remember as I can't check all of them.", color=0x00ff00)
                 await message.channel.send(embed=embedVar) #match over and hp text
                 await self.reportstats(message)
-                self.fighting = False
                 self.mode = ""
                 if self.p1.hp == 0 or self.p2.hp == 0:
                     embedVar = discord.Embed(title=("You finished your opponent with the exact number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
@@ -280,12 +262,13 @@ class MyClient(discord.Client):
                 if (self.p1.rolls[0] == 20 and self.p2.rolls[0] == 1) or (self.p2.rolls[0] == 20 and self.p2.rolls[0] == 1):
                     embedVar = discord.Embed(title=("Your first roll was a 20 and your opponent's was a miss!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
-                if (self.p1.rolls[-1] == self.luckies[self.p1.id]) or (self.p2.rolls[-1] == self.luckies[self.p2.id]):
+                if (self.p1.rolls[-1] == client.luckies[self.p1.id]) or (self.p2.rolls[-1] == client.luckies[self.p2.id]):
                     embedVar = discord.Embed(title=("You finished your opponent with your lucky number!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
                 if (self.p1.rolls[-1] == 20) or (self.p2.rolls[-1] == 20):
                     embedVar = discord.Embed(title=("You finished your opponent with a special attack!"), description="You can get an award if you don't already have it.", color=0x00ff00)
                     await message.channel.send(embed=embedVar)
+                self.endfight() #END THE FIGHT
         for i in {self.p1, self.p2}: #3 in a row
             if len(i.rolls) > 2 and i.rolls[-1] == i.rolls[-2] and i.rolls[-2] == i.rolls[-3]:
                 embedVar = discord.Embed(title=("You got three in a row!"), description="You get a bonus attack! You can also claim an award if you don't already have it :D", color=0x00ff00)
@@ -348,25 +331,13 @@ class MyClient(discord.Client):
                         self.p1.clash, self.p2.clash = 0, 0
                         return
 
-class Fighter: #Arena game player class
-        def reset(self, tag):
-            self.tag = tag #discord tag
-            self.id = self.tag.id #the long number
-            #self.name = "<@" +str(self.id) + ">" #<@numbers>
-            self.name = self.tag.name
-            self.hp = PLAYERHP #100 by default, set at top
-            self.ones = 0
-            self.twenties = 0
-            self.luckies = 0
-            self.seventeens = 0
-            self.clashwins = 0
-
-            self.last = -1
-            self.clash = 0
-            self.rolls = []
-
-        def stats(self):
-            return (f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
+    def endfight(self):
+        client.current_fighters.remove(self.p1.id)
+        client.current_fighters.remove(self.p2.id)
+        for i in client.current_fights:
+            if i.p1.id == self.p1.id:
+                client.current_fights.remove(i)
+    #When game is over: current_fighters.remove() both players
 
 
 #-----------------------------Slash Commands----------------------------#
@@ -386,6 +357,7 @@ async def roll(ctx, d):
             await ctx.send(content=f"Roll d{d}: `[{str(random.randint(1, int(d)))}]`")
         except: await ctx.send(content="Please enter a number between zero and one billion")
 
+
 #Fight
 @slash.slash(name="fight", description="Fight with another user according to the standard Arena rules.",
              options=[create_option(
@@ -394,35 +366,44 @@ async def roll(ctx, d):
                  option_type=6,
                  required=True)])
 async def fight(ctx, target):
-    if not client.fighting:
-        client.turn = client.p1
-        client.p1.reset(ctx.author)
-        client.p2.reset(target)
-        if client.p1.id == client.p2.id:
-            await ctx.send("You can't fight yourself.")
-            client.fighting = False
-        else: #try self.luckies, start fight
-            client.fighting = True
-            client.mode = ""
-            try: #checks if the lucky numbers are registered
-                embedVar = discord.Embed(title=(f"**{client.p1.tag.name}** challenges **{client.p2.tag.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
-                embedVar.add_field(name=(f"**{client.p1.tag.name}**'s lucky number is {client.luckies[client.p1.id]} and **{client.p2.tag.name}**'s is {client.luckies[client.p2.id]}."), 
-                                    value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
-                embedVar.set_thumbnail(url=(ctx.author.avatar_url))
-                await ctx.send(embed=embedVar)
-            except KeyError: #checks whose lucky number isn't registered
-                try:
-                    client.luckies[client.p1.id] #checking to see both players' lucky numbers are registered
-                except KeyError:
-                    await ctx.send(f"Uh oh, {client.p1.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
-                    client.fighting = False
-                try:
-                    client.luckies[client.p2.id]
-                except KeyError:
-                    await ctx.send(f"Uh oh, {client.p2.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `!setlucky` to temporarily set your lucky number to fight.")
-                    client.fighting = False
-    else: 
-        await ctx.send(f"There is already a fight going on between {client.p1.tag} and {client.p2.tag} and the maker of this bot did not anticipate that he needed to add code for more than one battle at a time. Please contact Melumi#5395 or ask the current fighters to wrap up or quit their game. Thank you.")
+    #Checks if they are already fighting:
+    if ctx.author.id in client.current_fighters:
+        await ctx.send("You can't fight two people at once.")
+        return
+    
+    if target.id in client.current_fighters:
+        await ctx.send(target.name + " is already in a fight.")
+        return
+
+    if ctx.author == target:
+        await ctx.send("You can't fight yourself.")
+        return
+
+    #checking to see both players' lucky numbers are registered
+    try:
+        client.luckies[ctx.author.id] 
+    except KeyError:
+        await ctx.send(f"Uh oh, {ctx.author.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
+        return
+    try:
+        client.luckies[target.id]
+    except KeyError:
+        await ctx.send(f"Uh oh, {target.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
+        return
+    
+    #Create an instance of the FightClass
+    #str(ctx.author.id) = FightClass(ctx.author, target)
+
+    #Add them to the list of fighters
+    client.current_fighters.append(ctx.author.id)
+    client.current_fighters.append(target.id)
+    client.current_fights.append(FightClass(ctx.author, target))
+
+    embedVar = discord.Embed(title=(f"**{ctx.author.name}** challenges **{target.name}** to a battle!"), description="The first player to lose all their health loses.", color=0x00ff00)
+    embedVar.add_field(name=(f"**{ctx.author.name}**'s lucky number is {client.luckies[ctx.author.id]} and **{target.name}**'s is {client.luckies[target.id]}."), 
+                        value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
+    embedVar.set_thumbnail(url=(ctx.author.avatar_url))
+    await ctx.send(embed=embedVar)
 
 #Sweat
 @slash.slash(name="sweat", description="For the Colin Cult big-sweaters")
