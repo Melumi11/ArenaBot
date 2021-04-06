@@ -33,6 +33,8 @@ This bot was created for a discord server that I am a part of called "The ARENA"
 
 These fight rules were written by StealthMsopz and the folks from The ARENA.
 
+Fegg support server: https://discord.gg/fwUpkpCY5U
+
 # Fight Rules:
 ### Base Rules:
 - Players start with 100 HP. (You can be at more than 100 HP.)
