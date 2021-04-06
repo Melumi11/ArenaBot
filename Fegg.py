@@ -50,7 +50,7 @@ class MyClient(discord.Client):
             if message_lower == '!sweat': await message.channel.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
             elif message_lower == '!help': #help command
-                embedVar = discord.Embed(title="All commands here are being moved to slash commands. Please type `/` to see them.", description="My name is Fegg. I am a bot coded by Melumi#5395", color=0x00ff00)
+                embedVar = discord.Embed(title="Hi, my name is Fegg!", description="I am a bot coded by Melumi#5395. You can find my source code and fight rules at https://github.com/Melumi11/Fegg\nAll commands can be viewed by typing `/`\nFegg support server: https://discord.gg/fwUpkpCY5U", color=0x00ff00)
                 embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||", inline=False)
                 await message.channel.send(embed=embedVar)
             
