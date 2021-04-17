@@ -452,7 +452,8 @@ async def audio(ctx, Source):
         try:
             r = ydl.extract_info(Source, download=False)
             await ctx.send(r['url'])
-        except Exception as e: await ctx.send(str(e)) 
+        except Exception as exception:
+            await ctx.send(f"**{type(exception).__name__}**: `{str(exception)[18:-89]}`")
 #-----------------------------------------------------------------------#
 
 #-------------------------------Launch bot------------------------------#
