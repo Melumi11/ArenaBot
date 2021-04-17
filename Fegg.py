@@ -1,5 +1,5 @@
 #-------------------------------import----------------------------------#
-import discord, logging, random, code#, asyncio
+import discord, logging, random, code, youtube_dl#, asyncio
 from discord.ext import commands
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
@@ -428,6 +428,31 @@ async def roll(ctx, Lucky):
         await ctx.send("Your lucky number has been set as " + str(client.luckies[ctx.author.id]) + " until the bot is restarted.")
     else: await ctx.send("Please choose a number between 1 and 20 (inclusive)")
 
+#Download
+def my_hook(d):
+    if d['status'] == 'finished':
+        print('Done downloading, now converting ...')
+ydl_opts = {
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }],
+    'progress_hooks': [my_hook]}
+
+@slash.slash(name="download", description="Find a media file, given a link. Use this if you want to quickly download something.",
+             options=[create_option(
+                 name="Source",
+                 description="Link to the media you want to find.",
+                 option_type=3,
+                 required=True)])
+async def audio(ctx, Source):
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        try:
+            r = ydl.extract_info(Source, download=False)
+            await ctx.send(r['url'])
+        except Exception as e: await ctx.send(str(e)) 
 #-----------------------------------------------------------------------#
 
 #-------------------------------Launch bot------------------------------#
