@@ -51,7 +51,7 @@ class MyClient(discord.Client):
 
             elif message_lower == '!help': #help command
                 embedVar = discord.Embed(title="Hi, my name is Fegg!", description="I am a bot coded by Melumi#5395. You can find my source code and fight rules at https://github.com/Melumi11/Fegg\nAll commands can be viewed by typing `/`\nFegg support server: https://discord.gg/fwUpkpCY5U", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also !setlucky||", inline=False)
+                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also `!setlucky`||\n`/download` (given a link to a website with audio or video, fegg attempts to find a direct link using youtube-dl)", inline=False)
                 await message.channel.send(embed=embedVar)
             
             elif message_lower.startswith("!setlucky"):
