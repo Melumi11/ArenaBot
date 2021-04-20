@@ -161,6 +161,7 @@ class FightClass():
                     self.other = self.p1
                     if self.p1.last == self.damage: #if self.p1's last is self.p2's current
                         self.mode = "clash"
+                        self.other.hp -= self.damage
                         await self.clashstart(message, self.damage) #doesn't self.reporthp, quits this function
                         return
                 await self.processattack(message, self.damage)
@@ -386,12 +387,12 @@ async def fight(ctx, target):
     try:
         client.luckies[ctx.author.id] 
     except KeyError:
-        await ctx.send(f"Uh oh, {ctx.author.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
+        await ctx.send(f"Uh oh, {ctx.author.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
         return
     try:
         client.luckies[target.id]
     except KeyError:
-        await ctx.send(f"Uh oh, {target.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
+        await ctx.send(f"Uh oh, {target.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
         return
     
     #Create an instance of the FightClass
