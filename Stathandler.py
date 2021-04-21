@@ -1,3 +1,5 @@
+import os
+
 import yaml
 
 
@@ -16,3 +18,32 @@ def read(name):
             return data
     except:
         return {"fnf": True}
+
+
+def readluckies():
+    luckies = {}
+    for filename in os.listdir("./players/"):
+        with open("./players/" + filename) as f:
+            data = yaml.load(f, Loader=yaml.FullLoader)
+            luckies[data["name"]] = data["lucky"]
+    return luckies
+
+# Outcomes:
+# 0 - Win
+# 1 - Loss
+# 2 - Draw
+def updatestats(name, outcome, twenties, ones, luckies, seventeens, clash):
+    data = {}
+    with open("./players/" + str(name) + ".yml") as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+    with open("./players/" + str(name) + ".yml", "w") as f:
+        data["twenties"] += twenties
+        data["ones"] += ones
+        data["luckies"] += luckies
+        data["seventeens"] += seventeens
+        data["clash"] += clash
+        data["total"] += 1
+        if outcome is 0:
+            data["wins"] += 1
+            data["losses"] += 1
+            data["draws"] += 1
