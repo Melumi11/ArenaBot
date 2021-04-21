@@ -11,7 +11,6 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 # -----------------------------------------------------------------------#
 
-# TODO: test automatic stat updating
 
 # -------------------------------variables-------------------------------#
 import Stathandler
@@ -218,9 +217,7 @@ class FightClass():
                 message.author.id == self.p1.id or message.author.id == self.p2.id):  # to abort the match
             embedVar = discord.Embed(
                 title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has been aborted.",
-                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
-            embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||",
-                               inline=False)
+                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\n\nHave a nice day!"), color=0x00ff00)
             await message.channel.send(embed=embedVar)  # match over and hp text
             await self.reportstats(message)
             self.mode = ""
@@ -235,6 +232,11 @@ class FightClass():
         embedVar = discord.Embed(title=(self.p2.tag.name + "'s stats:"), description=self.p2.stats(), color=0x00ff00)
         embedVar.set_thumbnail(url=(self.p2.tag.avatar_url))  # stats for player 2
         await message.channel.send(embed=embedVar)
+
+        Stathandler.updatestats(self.p1.id, 3, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                self.p1.seventeens, self.p1.clashwins)
+        Stathandler.updatestats(self.p2.id, 3, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                self.p2.seventeens, self.p2.clashwins)
 
     # runs after someone rolls
     async def processattack(self, message, dmg):
@@ -291,13 +293,13 @@ class FightClass():
                 embedVar = discord.Embed(
                     title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended in a draw.",
                     description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
-                embedVar.add_field(name=("Please update your stats with a draw."),
+                embedVar.add_field(name=("Your draw stat has been updated."),
                                    value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.",
                                    inline=False)
                 await message.channel.send(embed=embedVar)  # match over and hp text
-                Stathandler.updatestats(self.p1.name, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                Stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                         self.p1.seventeens, self.p1.clashwins)
-                Stathandler.updatestats(self.p2.name, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                         self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.endfight()  # END THE FIGHT
@@ -305,18 +307,18 @@ class FightClass():
             elif self.p1.hp <= 0 or self.p2.hp <= 0:
                 embedVar = discord.Embed(
                     title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended.",
-                    description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nPlease update your stats and awards, and try to remember as I can't check all of them.",
+                    description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nYour stats have been updated, but you need to update your awards.",
                     color=0x00ff00)
                 await message.channel.send(embed=embedVar)  # match over and hp text
                 if self.p1.hp <= 0:
-                    Stathandler.updatestats(self.p1.name, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                    Stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                             self.p2.seventeens, self.p1.clashwins)
-                    Stathandler.updatestats(self.p2.name, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                    Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
                 else:
-                    Stathandler.updatestats(self.p1.name, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                    Stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                             self.p2.seventeens, self.p1.clashwins)
-                    Stathandler.updatestats(self.p2.name, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                    Stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.mode = ""
@@ -557,7 +559,7 @@ async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones
                    clashes):
     Stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies,
                       seventeens, clashes)
-    await ctx.send("Your statistics have been updated!")
+    await ctx.send("Your stats have been updated!")
 
 
 @slash.slash(name="stats", description="Check a fighter's statistics.",
@@ -712,15 +714,15 @@ async def sweat(ctx):
 # Setlucky
 @slash.slash(name="setlucky", description="Temporarily set your lucky number.",
              options=[create_option(
-                 name="Lucky",
+                 name="lucky",
                  description="Choose a number between 1 and 20.",
                  option_type=4,
                  required=True)])
-async def roll(ctx, Lucky):
+async def roll(ctx, lucky):
     if ctx.author.id in client.luckies.keys():
         await ctx.send("Your lucky number is already set as " + str(client.luckies[ctx.author.id]))
-    elif 1 <= Lucky <= 20:
-        client.luckies[ctx.author.id] = Lucky
+    elif 1 <= lucky <= 20:
+        client.luckies[ctx.author.id] = lucky
         await ctx.send(
             "Your lucky number has been set as " + str(client.luckies[ctx.author.id]) + " until the bot is restarted.")
     else:

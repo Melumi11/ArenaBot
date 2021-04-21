@@ -1,5 +1,5 @@
 import os
-
+from os import path
 import yaml
 
 
@@ -28,22 +28,36 @@ def readluckies():
             luckies[data["name"]] = data["lucky"]
     return luckies
 
-# Outcomes:
-# 0 - Win
-# 1 - Loss
-# 2 - Draw
 def updatestats(name, outcome, twenties, ones, luckies, seventeens, clash):
-    data = {}
-    with open("./players/" + str(name) + ".yml") as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-    with open("./players/" + str(name) + ".yml", "w") as f:
-        data["twenties"] += twenties
-        data["ones"] += ones
-        data["luckies"] += luckies
-        data["seventeens"] += seventeens
-        data["clash"] += clash
-        data["total"] += 1
-        if outcome is 0:
-            data["wins"] += 1
-            data["losses"] += 1
-            data["draws"] += 1
+    data = read(name)
+    if data["fnf"]:
+        with open("./players/" + str(name) + ".yml", "w") as f:
+            yaml.dump(
+                {"fnf": False, "name": name, "special": "unknown", "weapon": "unknown", "lucky": 1, "total": 0,
+                 "wins": 0, "losses": 0, "draws": 0, "ones": 0, "twenties": 0, "luckies": 0, "seventeens": 0,
+                 "clashes": 0}, f)
+        data = read(name)
+    origtwenties = int(data["twenties"])
+    origones = int(data["ones"])
+    origluckies = int(data["luckies"])
+    origseventeens = int(data["seventeens"])
+    origclash = int(data["clashes"])
+    origtotal = int(data["total"])
+    data["twenties"] = origtwenties + twenties
+    data["ones"] = origones + ones
+    data["luckies"] = origluckies + luckies
+    data["seventeens"] = origseventeens + seventeens
+    data["clashes"] = origclash + clash
+    data["total"] = origtotal + 1
+    if outcome == 0:
+        origwins = int(data["wins"])
+        data["wins"] = origwins + 1
+    elif outcome == 1:
+        origwins = int(data["losses"])
+        data["losses"] = origwins + 1
+    elif outcome == 2:
+        origwins = int(data["draws"])
+        data["draws"] = origwins + 1
+    with open("./players/" + str(name) + ".yml", "r+") as f:
+        f.truncate(0)
+        yaml.dump(data, f)
