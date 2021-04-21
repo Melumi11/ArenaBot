@@ -1,4 +1,8 @@
 # -------------------------------import----------------------------------#
+import sys
+import threading
+from multiprocessing import Process
+
 import discord
 import logging
 import random
@@ -7,8 +11,6 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 # -----------------------------------------------------------------------#
 
-# TODO: make stats update automatically
-# TODO: make luckies grab from stats, not hardcoded
 
 # -------------------------------variables-------------------------------#
 import Stathandler
@@ -26,13 +28,11 @@ logging.basicConfig(level=logging.ERROR)
 
 
 # Handles main text reading and stuff
+
+
 class MyClient(discord.Client):
     # -------------------------------"Global" Variables:-------------------------------#
-    # Lucky numbers of the members in the Arena, as a dictionary
-    luckies = {806226322405720185: 1, 259716396198395904: 2, 543857545278783520: 3, 400514653957914635: 4,
-               246080207704817664: 5, 567819726013726722: 6, 332711880831270912: 7, 320559692269223938: 8,
-               194310041900154880: 9, 548617575282769922: 10, 640714673045504020: 11, 175824478423482368: 13,
-               294736827946893313: 16, 748751242003611739: 18, 731368690364186634: 19}
+    luckies = Stathandler.readluckies()
     MELUMI = 640714673045504020  # my discord id
     # For fight game:
     current_fighters = []
@@ -65,9 +65,13 @@ class MyClient(discord.Client):
                 await message.channel.send(
                     "https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
 
-            elif message_lower == '!help': #help command
-                embedVar = discord.Embed(title="Hi, my name is Fegg!", description="I am a bot coded by Melumi#5395. You can find my source code and fight rules at https://github.com/Melumi11/Fegg\nAll commands can be viewed by typing `/`\nFegg support server: https://discord.gg/fwUpkpCY5U", color=0x00ff00)
-                embedVar.add_field(name=("List of commands:"), value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also `!setlucky`||\n`/download` (given a link to a website with audio or video, fegg attempts to find a direct link using youtube-dl)", inline=False)
+            elif message_lower == '!help':  # help command
+                embedVar = discord.Embed(title="Hi, my name is Fegg!",
+                                         description="I am a bot coded by Melumi#5395. You can find my source code and fight rules at https://github.com/Melumi11/Fegg\nAll commands can be viewed by typing `/`\nFegg support server: https://discord.gg/fwUpkpCY5U",
+                                         color=0x00ff00)
+                embedVar.add_field(name=("List of commands:"),
+                                   value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also `!setlucky`||\n`/download` (given a link to a website with audio or video, fegg attempts to find a direct link using youtube-dl)",
+                                   inline=False)
                 await message.channel.send(embed=embedVar)
 
             elif message_lower.startswith("!setlucky"):
@@ -76,7 +80,7 @@ class MyClient(discord.Client):
                         "Your lucky number is already set as " + str(self.luckies[message.author.id]))
                 elif len(message.content) <= 10:
                     await message.channel.send(
-                        "Please type the command like `!setlucky 1` or `!setlucky 11`. You can also use /setlucky for more help.")
+                        "Please type the command like `!setlucky 1` or `!setlucky 11`. You can also use !setlucky for more help.")
                 else:
                     if message.content[10:].isdigit():
                         num = message.content[10:]
@@ -114,8 +118,7 @@ class Fighter:  # Arena game player class
         self.rolls = []
 
     def stats(self):
-        return (
-            f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins.")
+        return f"{self.name} got **{self.ones}** ones, **{self.twenties}** twenties,\n**{self.luckies}** lucky numbers, **{self.seventeens}** seventeens, and **{self.clashwins}** clash wins."
 
 
 class FightClass():
@@ -200,7 +203,7 @@ class FightClass():
                     if self.p1.last == self.damage:  # if self.p1's last is self.p2's current
                         self.mode = "clash"
                         self.other.hp -= self.damage
-                        await self.clashstart(message, self.damage) #doesn't self.reporthp, quits this function
+                        await self.clashstart(message, self.damage)  # doesn't self.reporthp, quits this function
                         return
                 await self.processattack(message, self.damage)
                 if self.mode == "17":  # not sure if this is needed
@@ -214,9 +217,7 @@ class FightClass():
                 message.author.id == self.p1.id or message.author.id == self.p2.id):  # to abort the match
             embedVar = discord.Embed(
                 title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has been aborted.",
-                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
-            embedVar.add_field(name="Have a nice day!", value="||(if this was an accident, please try !forceresume)||",
-                               inline=False)
+                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\n\nHave a nice day!"), color=0x00ff00)
             await message.channel.send(embed=embedVar)  # match over and hp text
             await self.reportstats(message)
             self.mode = ""
@@ -231,6 +232,11 @@ class FightClass():
         embedVar = discord.Embed(title=(self.p2.tag.name + "'s stats:"), description=self.p2.stats(), color=0x00ff00)
         embedVar.set_thumbnail(url=(self.p2.tag.avatar_url))  # stats for player 2
         await message.channel.send(embed=embedVar)
+
+        Stathandler.updatestats(self.p1.id, 3, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                self.p1.seventeens, self.p1.clashwins)
+        Stathandler.updatestats(self.p2.id, 3, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                self.p2.seventeens, self.p2.clashwins)
 
     # runs after someone rolls
     async def processattack(self, message, dmg):
@@ -287,19 +293,33 @@ class FightClass():
                 embedVar = discord.Embed(
                     title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended in a draw.",
                     description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
-                embedVar.add_field(name=("Please update your stats with a draw."),
+                embedVar.add_field(name=("Your draw stat has been updated."),
                                    value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.",
                                    inline=False)
                 await message.channel.send(embed=embedVar)  # match over and hp text
+                Stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                        self.p1.seventeens, self.p1.clashwins)
+                Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                        self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.endfight()  # END THE FIGHT
                 self.mode = ""
             elif self.p1.hp <= 0 or self.p2.hp <= 0:
                 embedVar = discord.Embed(
                     title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended.",
-                    description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nPlease update your stats and awards, and try to remember as I can't check all of them.",
+                    description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nYour stats have been updated, but you need to update your awards.",
                     color=0x00ff00)
                 await message.channel.send(embed=embedVar)  # match over and hp text
+                if self.p1.hp <= 0:
+                    Stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                            self.p2.seventeens, self.p1.clashwins)
+                    Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                            self.p2.seventeens, self.p2.clashwins)
+                else:
+                    Stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                            self.p2.seventeens, self.p1.clashwins)
+                    Stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                            self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.mode = ""
                 if self.p1.hp == 0 or self.p2.hp == 0:
@@ -535,9 +555,11 @@ async def roll(ctx, d):
                      required=True
                  )
              ])
-async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes):
-    Stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes)
-    await ctx.send("Your statistics have been updated!")
+async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens,
+                   clashes):
+    Stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies,
+                      seventeens, clashes)
+    await ctx.send("Your stats have been updated!")
 
 
 @slash.slash(name="stats", description="Check a fighter's statistics.",
@@ -654,14 +676,16 @@ async def fight(ctx, target):
     except KeyError:
         await ctx.send(
             f"Uh oh, {ctx.author.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
-        await ctx.send(f"Uh oh, {ctx.author.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
+        await ctx.send(
+            f"Uh oh, {ctx.author.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
         return
     try:
         client.luckies[target.id]
     except KeyError:
         await ctx.send(
             f"Uh oh, {target.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
-        await ctx.send(f"Uh oh, {target.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
+        await ctx.send(
+            f"Uh oh, {target.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
         return
 
     # Create an instance of the FightClass
@@ -690,15 +714,15 @@ async def sweat(ctx):
 # Setlucky
 @slash.slash(name="setlucky", description="Temporarily set your lucky number.",
              options=[create_option(
-                 name="Lucky",
+                 name="lucky",
                  description="Choose a number between 1 and 20.",
                  option_type=4,
                  required=True)])
-async def roll(ctx, Lucky):
+async def roll(ctx, lucky):
     if ctx.author.id in client.luckies.keys():
         await ctx.send("Your lucky number is already set as " + str(client.luckies[ctx.author.id]))
-    elif 1 <= Lucky <= 20:
-        client.luckies[ctx.author.id] = Lucky
+    elif 1 <= lucky <= 20:
+        client.luckies[ctx.author.id] = lucky
         await ctx.send(
             "Your lucky number has been set as " + str(client.luckies[ctx.author.id]) + " until the bot is restarted.")
     else:
