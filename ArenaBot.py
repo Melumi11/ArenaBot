@@ -6,7 +6,6 @@ from multiprocessing import Process
 import discord
 import logging
 import random
-import youtube_dl
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 # -----------------------------------------------------------------------#
@@ -21,14 +20,6 @@ PLAYERHP = 100  # Starting health for both players
 
 # Logging errors
 logging.basicConfig(level=logging.ERROR)
-
-
-# logging.basicConfig(level=logging.CRITICAL)
-# logging.basicConfig(level=logging.WARNING) #Only the first one is actually used lol, me dum
-
-
-# Handles main text reading and stuff
-
 
 class MyClient(discord.Client):
     # -------------------------------"Global" Variables:-------------------------------#
@@ -61,16 +52,12 @@ class MyClient(discord.Client):
 
         message_lower = message.content.lower()  # converts message to lowercase (cuz it's used a lot)
         if message_lower.startswith('!'):
-            if message_lower == '!sweat':
-                await message.channel.send(
-                    "https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
-
-            elif message_lower == '!help':  # help command
+            if message_lower == '!help':  # help command
                 embedVar = discord.Embed(title="Hi, my name is ArenaBot!",
                                          description="I am a bot coded by Melumi#5395. You can find my source code and fight rules at https://github.com/Melumi11/ArenaBot\nAll commands can be viewed by typing `/`\nArenaBot Support Server: https://discord.gg/fwUpkpCY5U",
                                          color=0x00ff00)
                 embedVar.add_field(name=("List of commands:"),
-                                   value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/sweat` (For the Colin Cult big-sweaters) ||Also `!sweat`||\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also `!setlucky`||\n`/download` (given a link to a website with audio or video, fegg attempts to find a direct link using youtube-dl)",
+                                   value="`!help` (this command)\n`/fight` (fight command for the Arena)\n`/roll` (rolls a single die with up to a billion faces)\n`/setlucky` (sets your lucky number for Arena fights. Lasts until the bot is restarted (which can be often)) ||Also `!setlucky`||",
                                    inline=False)
                 await message.channel.send(embed=embedVar)
 
@@ -98,6 +85,7 @@ class MyClient(discord.Client):
         elif 'parm' in message_lower:  # parm
             await message.channel.send("https://images.heb.com/is/image/HEBGrocery/000081264")
             await message.author.send("https://images.heb.com/is/image/HEBGrocery/000081264")
+            #hehe
 
 
 class Fighter:  # Arena game player class
@@ -705,12 +693,6 @@ async def fight(ctx, target):
     await ctx.send(embed=embedVar)
 
 
-# Sweat
-@slash.slash(name="sweat", description=":colinsweat:")
-async def sweat(ctx):
-    await ctx.send("https://cdn.discordapp.com/attachments/822493563619246131/822498710873178133/unknown.png")
-
-
 # Setlucky
 @slash.slash(name="setlucky", description="Temporarily set your lucky number.",
              options=[create_option(
@@ -727,38 +709,6 @@ async def roll(ctx, lucky):
             "Your lucky number has been set as " + str(client.luckies[ctx.author.id]) + " until the bot is restarted.")
     else:
         await ctx.send("Please choose a number between 1 and 20 (inclusive)")
-
-
-# Download
-def my_hook(d):
-    if d['status'] == 'finished':
-        print('Done downloading, now converting ...')
-
-
-ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-    'progress_hooks': [my_hook]}
-
-
-@slash.slash(name="download",
-             description="Find a media file, given a link. Use this if you want to quickly download something.",
-             options=[create_option(
-                 name="Source",
-                 description="Link to the media you want to find.",
-                 option_type=3,
-                 required=True)])
-async def audio(ctx, Source):
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        try:
-            r = ydl.extract_info(Source, download=False)
-            await ctx.send(r['url'])
-        except Exception as exception:
-            await ctx.send(f"**{type(exception).__name__}**: `{str(exception)[18:-89]}`")
 
 
 # -----------------------------------------------------------------------#
