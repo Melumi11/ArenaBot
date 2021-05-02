@@ -1,12 +1,12 @@
 <div align="center">
-<h1>Fegg: a multiplayer roleplay fighting discord bot</h1>
+<h1>ArenaBot: a multiplayer roleplay fighting discord bot</h1>
 </div>
 
-![](https://github.com/Melumi11/Fegg/blob/main/demo.png)
+![](https://github.com/Melumi11/ArenaBot/blob/main/demo.png)
 
 ### Index
 
--   [Fegg](#)
+-   [ArenaBot](#)
     -   [Features](#features)
     -   [Notes](#notes)
     -   [Fight Rules](#fight-rules)
@@ -24,16 +24,16 @@
 ### Features:
 
 -   **Slash Commands** - They're super cool and fancy
--   **Epic Commands** - Like /sweat and /roll
+-   **Epic Commands** - Like /fight and /roll
 -   **Parm** - ████████
--   **Suports Concurrent Fights** - Two fights can be fought at the same time
+-   **Suports Concurrent Fights** - Multiple fights between different fighters can be fought at the same time
 
 ### Notes:
 This bot was created for a discord server that I am a part of called "The ARENA" where I and some friends do roleplay fights.
 
 These fight rules were written by StealthMsopz and the folks from The ARENA.
 
-Fegg support server: https://discord.gg/fwUpkpCY5U
+ArenaBot Support Server: https://discord.gg/fwUpkpCY5U
 
 # Fight Rules:
 ### Base Rules:
