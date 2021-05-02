@@ -1,6 +1,8 @@
 # -------------------------------import----------------------------------#
+import select
 import sys
 import threading
+import tty
 from multiprocessing import Process
 
 import discord
@@ -9,6 +11,7 @@ import random
 import youtube_dl
 from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
+import termios
 # -----------------------------------------------------------------------#
 
 
@@ -45,6 +48,7 @@ class MyClient(discord.Client):
                                     name="the Arena")  # Playing, Listening to, Watching, also streaming, competing
         await client.change_presence(activity=activity)
         print(f'We have logged in as {self.user}')
+        print('Bot Online')
 
     # Reading messages
     async def on_message(self, message):
@@ -217,7 +221,8 @@ class FightClass():
                 message.author.id == self.p1.id or message.author.id == self.p2.id):  # to abort the match
             embedVar = discord.Embed(
                 title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has been aborted.",
-                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\n\nHave a nice day!"), color=0x00ff00)
+                description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\n\nHave a nice day!"),
+                color=0x00ff00)
             await message.channel.send(embed=embedVar)  # match over and hp text
             await self.reportstats(message)
             self.mode = ""
@@ -764,6 +769,27 @@ async def audio(ctx, Source):
 # -----------------------------------------------------------------------#
 
 # -------------------------------Launch bot------------------------------#
+def isData():
+    return select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], [])
+
+
+old_settings = termios.tcgetattr(sys.stdin)
+try:
+    tty.setcbreak(sys.stdin.fileno())
+
+    i = 0
+    while 1:
+        print(i)
+        i += 1
+
+        if isData():
+            c = sys.stdin.read(1)
+            if c == 'stop':
+                break
+
+finally:
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_settings)
+
 with open('token.txt') as f:
     TOKEN = f.readline()
 client.run(TOKEN)
