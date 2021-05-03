@@ -10,8 +10,8 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 
 # My Classes
-from Client import * # Main class responsible for reading messages and stuff
-from Fight import * # Fighter class and FightClass which handles the fights
+from client import * # Main class responsible for reading messages and stuff
+from fight import * # Fighter class and FightClass which handles the fights
 # -----------------------------------------------------------------------#
 
 
