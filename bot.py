@@ -302,12 +302,9 @@ def isData():
 old_settings = termios.tcgetattr(sys.stdin)
 try:
     tty.setcbreak(sys.stdin.fileno())
-
     i = 0
     while 1:
-        print(i)
         i += 1
-
         if isData():
             c = sys.stdin.read(1)
             if c == 'stop':
