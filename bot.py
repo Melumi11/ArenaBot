@@ -225,8 +225,6 @@ async def stats(ctx, fighter):
                  option_type=6,
                  required=True)])
 async def fight(ctx, target):
-    print(ctx.author)
-    print(target)
     # Checks if they are already fighting:
     if ctx.author.id in client.current_fighters:
         await ctx.send("You can't fight two people at once.")
