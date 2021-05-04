@@ -311,17 +311,16 @@ class FightClass():
                 self.turn.clash = 2
                 await message.channel.send(
                     "You automatically win the clash. If you don't already have the award, please claim it now.")
-
-            if not winner and self.turn.id == self.p1.id:  # cuz turn is backwards
+            if not winner and self.turn.id == self.p1.id: # sets p1's attack to p2.last
                 self.p2.last = self.damage  # for checking who won the round
             else:  # self.turn is self.p2, time to check stuff
-                if self.damage > self.p2.last:
-                    self.p2.clash += 1  # checks who won the clash
+                if self.damage > self.p2.last: # if p2's attack is greater than p1's attack
+                    self.p2.clash += 1 
                 elif self.damage < self.p2.last:
                     self.p1.clash += 1
                 else:
                     await message.channel.send(
-                        "wtf you got the same number and idk what to do so I won't count this one")
+                        "you got the same number and idk what to do so I won't count this one")
                 if self.p1.clash >= 2:
                     winner = self.p1
                 elif self.p2.clash >= 2:
@@ -334,7 +333,7 @@ class FightClass():
                                              color=0x00ff00)
                     embedVar.set_thumbnail(url=(winner.tag.avatar_url))
                     await message.channel.send(embed=embedVar)
-                    await self.reporthp(message, self.p1.last)
+                    await message.channel.send(f"{winner.name} has done the {self.p1.last} damage.\n{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}")
                     self.mode = ""
                     self.p2.last = -1
                     self.turn = self.p1
