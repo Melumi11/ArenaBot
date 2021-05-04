@@ -2,3 +2,4 @@ token.txt
 .vscode/settings.json
 /players/
 *.pyc
+/venv/
