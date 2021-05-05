@@ -1,9 +1,9 @@
 import discord
-import Stathandler
+import stathandler
 
 class Client(discord.Client):
     # -------------------------------"Global" Variables:-------------------------------#
-    luckies = Stathandler.readluckies()
+    luckies = stathandler.readluckies()
     MELUMI = 640714673045504020  # my discord id
     # For fight game:
     current_fighters = []
