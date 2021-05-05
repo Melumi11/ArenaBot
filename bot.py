@@ -221,7 +221,7 @@ async def stats(ctx, fighter):
 @slash.slash(name="fight", description="Fight with another user according to the standard Arena rules.",
              options=[create_option(
                  name="Target",
-                 description="Please @ the user who you would like to fight with.",
+                 description="Please choose the user who you would like to fight with.",
                  option_type=6,
                  required=True)])
 async def fight(ctx, target):
@@ -230,11 +230,15 @@ async def fight(ctx, target):
         await ctx.send("You can't fight two people at once.")
         return
 
-    if target.id in client.current_fighters:
-        await ctx.send(target.name + " is already in a fight.")
+    try:
+        if target.id in client.current_fighters:
+            await ctx.send(target.name + " is already in a fight.")
+            return
+    except Exception as exception:
+        await ctx.send(f"An error has occured: `{exception}`. \nThis might be because you are in a dm but I'm not sure. If something is wrong, please notify Melumi#5395 in chat or in the official support server (!help)")
         return
-
-    if ctx.author == target:
+    
+    if ctx.author.id == target.id:
         await ctx.send("You can't fight yourself.")
         return
 
@@ -243,17 +247,13 @@ async def fight(ctx, target):
         client.luckies[ctx.author.id]
     except KeyError:
         await ctx.send(
-            f"Uh oh, {ctx.author.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
-        await ctx.send(
-            f"Uh oh, {ctx.author.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
+            f"Uh oh, {ctx.author.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight, and `/setstats` to set your stats permanently, including lucky number.")
         return
     try:
         client.luckies[target.id]
     except KeyError:
         await ctx.send(
-            f"Uh oh, {target.name}'s lucky number is not in my database. Please ask Melumi#5395 for help.\nYou can also use `/setlucky` to temporarily set your lucky number to fight.")
-        await ctx.send(
-            f"Uh oh, {target.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight.")
+            f"Uh oh, {target.name}'s lucky number is not in my database. \nYou can use `/setlucky` to temporarily set your lucky number to fight, and `/setstats` to set your stats permanently, including lucky number.")
         return
 
     # Create an instance of the FightClass
