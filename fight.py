@@ -1,6 +1,6 @@
 import discord
 import random
-import Stathandler
+import stathandler
 
 class Fighter:  # Arena game player class
     def __init__(self, tag, PLAYERHP):
@@ -94,7 +94,8 @@ class FightClass():
                         self.damage = random.randint(1, 30)
                 # normal:
                 else:
-                    self.damage = random.randint(1, 20)
+                    self.damage = 101
+                    # self.damage = random.randint(1, 20)
                 if self.turn.id == self.p2.id: self.p2.hp -= self.p1.last  # END OF WARNING
 
                 self.turn.rolls.append(self.damage)  # Tracks every roll
@@ -135,11 +136,6 @@ class FightClass():
         embedVar = discord.Embed(title=(self.p2.tag.name + "'s stats:"), description=self.p2.stats(), color=0x00ff00)
         embedVar.set_thumbnail(url=(self.p2.tag.avatar_url))  # stats for player 2
         await message.channel.send(embed=embedVar)
-
-        Stathandler.updatestats(self.p1.id, 3, self.p1.twenties, self.p1.ones, self.p1.luckies,
-                                self.p1.seventeens, self.p1.clashwins)
-        Stathandler.updatestats(self.p2.id, 3, self.p2.twenties, self.p2.ones, self.p2.luckies,
-                                self.p2.seventeens, self.p2.clashwins)
 
     # runs after someone rolls
     async def processattack(self, message, dmg):
@@ -192,7 +188,7 @@ class FightClass():
     # Checks if the game is over, including draw clash
     async def checkstuff(self, message):
         if self.turn == self.p2:
-            if self.p1.hp <= 0 and self.p2.hp <= 0:  # draw
+            if self.p1.hp <= 0 or self.p2.hp <= 0 and self.p1.hp == self.p2.hp:  # draw
                 embedVar = discord.Embed(
                     title=f"The match between {self.p1.tag.name} and {self.p2.tag.name} has ended in a draw.",
                     description=(f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}"), color=0x00ff00)
@@ -200,9 +196,9 @@ class FightClass():
                                    value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.",
                                    inline=False)
                 await message.channel.send(embed=embedVar)  # match over and hp text
-                Stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                         self.p1.seventeens, self.p1.clashwins)
-                Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                stathandler.updatestats(self.p2.id, 2, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                         self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.endfight()  # END THE FIGHT
@@ -213,15 +209,15 @@ class FightClass():
                     description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nYour stats have been updated, but you need to update your awards.",
                     color=0x00ff00)
                 await message.channel.send(embed=embedVar)  # match over and hp text
-                if self.p1.hp <= 0:
-                    Stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                if self.p1.hp < self.p2.hp:
+                    stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                             self.p2.seventeens, self.p1.clashwins)
-                    Stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                    stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
                 else:
-                    Stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                    stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                             self.p2.seventeens, self.p1.clashwins)
-                    Stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                    stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.mode = ""

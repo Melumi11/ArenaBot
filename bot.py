@@ -1,8 +1,6 @@
 # -------------------------------import----------------------------------#
 import select
 import sys
-import tty
-import termios
 
 import discord
 import logging
@@ -11,13 +9,13 @@ from discord_slash import SlashCommand
 from discord_slash.utils.manage_commands import create_option
 
 # My Classes
+import stathandler
 from client import * # Main class responsible for reading messages and stuff
 from fight import * # Fighter class and FightClass which handles the fights
 # -----------------------------------------------------------------------#
 
 
 # -------------------------------variables-------------------------------#
-import Stathandler
 
 TOKEN = ''  # Bot token
 PLAYERHP = 100  # Starting health for both players
@@ -123,11 +121,12 @@ async def roll(ctx, d):
                      required=True
                  )
              ])
-async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens,
-                   clashes):
-    Stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies,
-                      seventeens, clashes)
-    await ctx.send("Your stats have been updated!")
+async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes):
+    if "," in str(special):
+        await ctx.send("Your stats cant have commas in them!")
+    else:
+        stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes)
+        await ctx.send("Your stats have been updated!")
 
 
 @slash.slash(name="stats", description="Check a fighter's statistics.",
@@ -140,15 +139,16 @@ async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones
                  )
              ])
 async def stats(ctx, fighter):
-    fstats = Stathandler.read(fighter.id)
-    if fstats["fnf"]:
+    fullstats = stathandler.read(fighter.id)
+    if not fullstats[0]:
         embed = discord.Embed(
             title=ctx.author.name + " doesn't seem to have any statistics.",
-            description="If you're" + ctx.author.name + ", use /setstats to set your statistics!",
+            description="If you're " + fighter.name + " and want to change these, use /setstats to set your statistics!",
             color=0x00ff00
         )
         await ctx.send(embed=embed)
     else:
+        fstats = fullstats[1]
         embed = discord.Embed(
             title=fighter.name + "'s Statistics",
             description="If you're " + fighter.name + " and want to change these, use /setstats to set your statistics!",
@@ -156,62 +156,62 @@ async def stats(ctx, fighter):
         )
         embed.add_field(
             name="Special Attack:",
-            value=fstats["special"],
+            value=fstats[1],
             inline=False
         )
         embed.add_field(
             name="Weapon:",
-            value=fstats["weapon"],
+            value=fstats[2],
             inline=False
         )
         embed.add_field(
             name="Lucky Number:",
-            value=fstats["lucky"],
+            value=fstats[3],
             inline=False
         )
         embed.add_field(
             name="Total Fights:",
-            value=fstats["total"],
+            value=fstats[4],
             inline=False
         )
         embed.add_field(
             name="Wins:",
-            value=str(fstats["wins"]),
+            value=str(fstats[5]),
             inline=False
         )
         embed.add_field(
             name="Losses:",
-            value=str(fstats["losses"]),
+            value=str(fstats[6]),
             inline=False
         )
         embed.add_field(
             name="Draws:",
-            value=str(fstats["draws"]),
+            value=str(fstats[7]),
             inline=False
         )
         embed.add_field(
             name="1s Rolled:",
-            value=str(fstats["ones"]),
+            value=str(fstats[8]),
             inline=False
         )
         embed.add_field(
             name="20s Rolled:",
-            value=str(fstats["twenties"]),
+            value=str(fstats[9]),
             inline=False
         )
         embed.add_field(
             name="Lucky Numbers Rolled:",
-            value=str(fstats["luckies"]),
+            value=str(fstats[10]),
             inline=False
         )
         embed.add_field(
             name="Seventeens Used For Healing:",
-            value=str(fstats["seventeens"]),
+            value=str(fstats[11]),
             inline=False
         )
         embed.add_field(
             name="Clashes:",
-            value=str(fstats["clashes"]),
+            value=str(fstats[12]),
             inline=False
         )
         await ctx.send(embed=embed)
@@ -263,7 +263,6 @@ async def fight(ctx, target):
     client.current_fighters.append(ctx.author.id)
     client.current_fighters.append(target.id)
     client.current_fights.append(FightClass(ctx.author, target, client, PLAYERHP))
-
     embedVar = discord.Embed(title=(f"**{ctx.author.name}** challenges **{target.name}** to a battle!"),
                              description="The first player to lose all their health loses.", color=0x00ff00)
     embedVar.add_field(name=(
