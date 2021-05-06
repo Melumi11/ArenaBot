@@ -94,8 +94,7 @@ class FightClass():
                         self.damage = random.randint(1, 30)
                 # normal:
                 else:
-                    self.damage = 101
-                    # self.damage = random.randint(1, 20)
+                    self.damage = random.randint(1, 20)
                 if self.turn.id == self.p2.id: self.p2.hp -= self.p1.last  # END OF WARNING
 
                 self.turn.rolls.append(self.damage)  # Tracks every roll
