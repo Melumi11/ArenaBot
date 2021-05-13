@@ -15,7 +15,7 @@ class Client(discord.Client):
         activity = discord.Activity(type=discord.ActivityType.competing,
                                     name="the Arena")  # Playing, Listening to, Watching, also streaming, competing
         await self.change_presence(activity=activity)
-        print('bot online')
+        print('Python Application Loaded')
 
     # Reading messages
     async def on_message(self, message):
