@@ -243,7 +243,7 @@ def fight():
         # Add them to the list of fighters
         client.current_fighters.append(ctx.author.id)
         client.current_fighters.append(target.id)
-        client.current_fights.append(FightClass(ctx.author, target, client, PLAYERHP))
+        client.current_fights.append(FightClass(ctx.author, target, client, PLAYERHP, ctx.channel.id))
         embedVar = discord.Embed(title=(f"**{ctx.author.name}** challenges **{target.name}** to a battle!"),
                                 description="The first player to lose all their health loses.", color=0x00ff00)
         embedVar.add_field(name=(
