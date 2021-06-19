@@ -24,12 +24,16 @@ class Fighter:  # Arena game player class
 
 
 class FightClass():
-    def __init__(self, sender, target, client, PLAYERHP):
+    def __init__(self, sender, target, client, PLAYERHP, channel):
         self.mode = ""
         self.p1 = Fighter(sender, PLAYERHP)
         self.p2 = Fighter(target, PLAYERHP)
         self.turn = self.p1
         self.client = client
+        # Channel checking for statistic updating
+        self.channel = channel
+        self.officialFights1 = 796200467146735646
+        self.officialFights2 = 796478745724715049
 
     # Reading Messages, called by self.client class
     async def fight(self, message):  # Fight method
@@ -195,10 +199,12 @@ class FightClass():
                                    value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.",
                                    inline=False)
                 await message.channel.send(embed=embedVar)  # match over and hp text
-                stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                if self.channel == self.officialFights1 or self.channel == self.officialFights2:
+                    stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                         self.p1.seventeens, self.p1.clashwins)
-                stathandler.updatestats(self.p2.id, 2, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                    stathandler.updatestats(self.p2.id, 2, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                         self.p2.seventeens, self.p2.clashwins)
+
                 await self.reportstats(message)
                 self.endfight()  # END THE FIGHT
                 self.mode = ""
@@ -208,16 +214,17 @@ class FightClass():
                     description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nYour stats have been updated, but you need to update your awards.",
                     color=0x00ff00)
                 await message.channel.send(embed=embedVar)  # match over and hp text
-                if self.p1.hp < self.p2.hp:
-                    stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
-                                            self.p2.seventeens, self.p1.clashwins)
-                    stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
-                                            self.p2.seventeens, self.p2.clashwins)
-                else:
-                    stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
-                                            self.p2.seventeens, self.p1.clashwins)
-                    stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
-                                            self.p2.seventeens, self.p2.clashwins)
+                if self.channel == self.officialFights1 or self.channel == self.officialFights2:
+                    if self.p1.hp < self.p2.hp:
+                        stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                                self.p2.seventeens, self.p1.clashwins)
+                        stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                                self.p2.seventeens, self.p2.clashwins)
+                    else:
+                        stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
+                                                self.p2.seventeens, self.p1.clashwins)
+                        stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
+                                                self.p2.seventeens, self.p2.clashwins)
                 await self.reportstats(message)
                 self.mode = ""
                 if self.p1.hp == 0 or self.p2.hp == 0:

@@ -21,6 +21,11 @@
          - [Battle Awards](#battle-awards)
          - [Stats Template](#stats-template)
 
+### Requirements
+
+-   discord.py
+-   discord-py-slash-command
+
 ### Features:
 
 -   **Slash Commands** - They're super cool and fancy
@@ -151,37 +156,3 @@ ArenaBot Support Server: https://discord.gg/fwUpkpCY5U
 **Clash 100** - Roll a 100 during a clash for an instant clash win.
 
 **Punisher** - Roll a 30 using a d30.
-
-
-
-### Stats Template:
-
-Stats: (Name)
-
-Special:
-
-Weapon:
-
-Lucky Number: (Can't be 1, 17, 20 or another player's number.)
-
-
-
-Total Games:
-
-Wins:
-
-Losses:
-
-Draws:
-
-
-
-1s Rolled:
-
-20s Rolled:
-
-Lucky Numbers Rolled:
-
-17 Heals Used:
-
-Clash Wins:
