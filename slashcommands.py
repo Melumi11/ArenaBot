@@ -5,6 +5,9 @@ from discord_slash.model import SlashCommandOptionType
 import stathandler
 import discord
 from fight import FightClass
+# For select/dropdown:
+from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow, ComponentContext
+from discord.ext import commands
 
 def roll():
     description = "Dice roll command, up to 999,999,999"
@@ -251,6 +254,17 @@ def fight():
             value=("Type `roll` to attack and `!quit` to stop fighting."), inline=False)
         embedVar.set_thumbnail(url=(ctx.author.avatar_url))
         await ctx.send(embed=embedVar)
+
+        select = create_select(
+            options=[# the options in your dropdown
+                create_select_option("Casual Fight", value="casual", emoji={'name': 'SofiaUwU', 'id': 837785194751721532}),
+                create_select_option("Official Fight", value="official", emoji={'name': 'sofiagun', 'id': 809882437508399144}),
+            ],
+            placeholder="Choose your fight type", 
+            min_values=1,  # the minimum number of options a user must select
+            max_values=1,  # the maximum number of options a user can select
+        )
+        await ctx.send("Please choose your fight type. You can do this at any time, and this will override whatever has been selected previously.", components=[create_actionrow(select)])  # like action row with buttons but without * in front of the variable
 
 
 def setlucky():

@@ -1,6 +1,7 @@
 import discord
 import random
 import stathandler
+from discord_slash.utils.manage_components import ComponentContext
 
 class Fighter:  # Arena game player class
     def __init__(self, tag, PLAYERHP):
@@ -32,8 +33,11 @@ class FightClass():
         self.client = client
         # Channel checking for statistic updating
         self.channel = channel
-        self.officialFights1 = 796200467146735646
-        self.officialFights2 = 796478745724715049
+        # official fights 1 & 2, tournament fights a & b, final tournament fight channels
+        self.official_fight_channels = {796200467146735646, 796478745724715049, 866041472066912256, 866041535069683762, 866041598085038106}
+        self.track_stats = False
+        if self.channel in self.official_fight_channels:
+            self.track_stats = True
 
     # Reading Messages, called by self.client class
     async def fight(self, message):  # Fight method
@@ -234,7 +238,7 @@ class FightClass():
                                 value="If you would like to draw clash for the award, you can use `!roll d100` and win 3 out of 5 rolls.",
                                 inline=False)
             await message.channel.send(embed=embedVar)  # match over and hp text
-            if self.channel == self.officialFights1 or self.channel == self.officialFights2:
+            if self.track_stats == True:
                 stathandler.updatestats(self.p1.id, 2, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                     self.p1.seventeens, self.p1.clashwins)
                 stathandler.updatestats(self.p2.id, 2, self.p2.twenties, self.p2.ones, self.p2.luckies,
@@ -249,7 +253,7 @@ class FightClass():
                 description=f"{self.p1.name} HP: {self.p1.hp}\n{self.p2.name} HP: {self.p2.hp}\nYour stats have been updated, but you need to update your awards.",
                 color=0x00ff00)
             await message.channel.send(embed=embedVar)  # match over and hp text
-            if self.channel == self.officialFights1 or self.channel == self.officialFights2:
+            if self.track_stats == True:
                 if self.p1.hp < self.p2.hp:
                     stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
                                             self.p2.seventeens, self.p1.clashwins)
@@ -406,3 +410,18 @@ class FightClass():
             if i.p1.id == self.p1.id:
                 self.client.current_fights.remove(i)
     # When game is over: current_fighters.remove() both players
+
+    async def on_component(self, ctx):
+        # ctx.selected_options is a list of all the values the user selected
+        if ctx.selected_options == ["official"] or ctx.selected_options == ["casual"]:
+            if ctx.author.id == self.p1.id:
+                if ctx.selected_options == ["official"]:
+                    await ctx.send(content=f"{ctx.author.name} has selected `Official Fight`")
+                    self.track_stats = True
+                if ctx.selected_options == ["casual"]:
+                    await ctx.send(content=f"{ctx.author.name} has selected `Casual Fight`")
+                    self.track_stats = False
+                if self.track_stats == True: await ctx.send(content="Stats **will** be tracked.")
+                else: await ctx.send(content="Stats will **not** be tracked.")
+            else:
+                await ctx.send(content=f"You are not {self.p1.name}, you are {ctx.author.name}")

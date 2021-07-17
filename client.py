@@ -1,5 +1,6 @@
 import discord
 import stathandler
+from discord_slash.utils.manage_components import ComponentContext
 
 class Client(discord.Client):
     # -------------------------------"Global" Variables:-------------------------------#
@@ -16,7 +17,7 @@ class Client(discord.Client):
                                     name="the Arena")  # Playing, Listening to, Watching, also streaming, competing
         await self.change_presence(activity=activity)
         print('Python Application Loaded')
-
+    
     # Reading messages
     async def on_message(self, message):
         if message.author == self.user:  # so that the bot doesn't message itself
@@ -66,3 +67,8 @@ class Client(discord.Client):
             await message.channel.send("https://images.heb.com/is/image/HEBGrocery/000081264")
             await message.author.send("https://images.heb.com/is/image/HEBGrocery/000081264")
             #hehe
+    
+    async def on_component(self, ctx: ComponentContext):
+        # ctx.selected_options is a list of all the values the user selected
+        for i in self.current_fights:
+            await i.on_component(ctx)
