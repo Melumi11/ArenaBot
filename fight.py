@@ -55,7 +55,6 @@ class FightClass():
                     self.other.hp -= self.damage
                     await self.reporthp(message, str(self.damage))
                     self.turn = self.p1  # switch turns
-                    await self.checkstuff(message)
                     self.mode = ""  # not 17 anymore
                     await self.checkstuff(message)  # checks if game is over
                 else:
