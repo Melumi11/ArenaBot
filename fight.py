@@ -254,14 +254,14 @@ class FightClass():
                 color=0x00ff00)
             await message.channel.send(embed=embedVar)  # match over and hp text
             if self.track_stats == True:
-                if self.p1.hp < self.p2.hp:
+                if self.p1.hp > self.p2.hp:
                     stathandler.updatestats(self.p1.id, 1, self.p1.twenties, self.p1.ones, self.p1.luckies,
-                                            self.p2.seventeens, self.p1.clashwins)
+                                            self.p1.seventeens, self.p1.clashwins)
                     stathandler.updatestats(self.p2.id, 0, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
                 else:
                     stathandler.updatestats(self.p1.id, 0, self.p1.twenties, self.p1.ones, self.p1.luckies,
-                                            self.p2.seventeens, self.p1.clashwins)
+                                            self.p1.seventeens, self.p1.clashwins)
                     stathandler.updatestats(self.p2.id, 1, self.p2.twenties, self.p2.ones, self.p2.luckies,
                                             self.p2.seventeens, self.p2.clashwins)
             await self.reportstats(message)
