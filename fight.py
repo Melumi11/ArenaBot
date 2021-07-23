@@ -118,6 +118,13 @@ class FightClass():
                         if self.damage != 17: 
                             self.other.hp -= self.damage
                         await self.clashstart(message, self.damage)  # doesn't self.reporthp, quits this function
+                        # Stats still need to be updated
+                        if self.damage == 1:  # updates stats
+                            self.turn.ones += 1
+                        elif self.damage == self.client.luckies[self.turn.id]:  # updates stats
+                            self.turn.luckies += 1
+                        elif self.damage == 20:  # updates stats
+                            self.turn.twenties += 1
                         return
                 # This next line checks if p1 rolled a 17. If so, it's time to do the thing
                 if self.mode == "17a": self.mode = "17b"
