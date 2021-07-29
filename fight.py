@@ -1,7 +1,6 @@
 import discord
 import random
 import stathandler
-from discord_slash.utils.manage_components import ComponentContext
 
 class Fighter:  # Arena game player class
     def __init__(self, tag, PLAYERHP):
@@ -416,6 +415,7 @@ class FightClass():
                 self.client.current_fights.remove(i)
     # When game is over: current_fighters.remove() both players
 
+    # This command (for dropdowns/buttons) is called by the client, cuz it doesn't work by itself here
     async def on_component(self, ctx):
         # ctx.selected_options is a list of all the values the user selected
         if ctx.selected_options == ["official"] or ctx.selected_options == ["casual"]:

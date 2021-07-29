@@ -28,7 +28,8 @@
 
 ### Features:
 
--   **Slash Commands** - They're super cool and fancy
+-   **Slash Commands** - Type a foreward slash to see all commands! Command names autofill when you type and they have custom inputs!
+-   **Dropdowns** - The bot asks what type of fight you'd like to have (not shown in screenshot)
 -   **Epic Commands** - Like /fight and /roll
 -   **Parm** - ████████
 -   **Suports Concurrent Fights** - Multiple fights between different fighters can be fought at the same time

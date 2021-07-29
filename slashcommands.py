@@ -6,8 +6,7 @@ import stathandler
 import discord
 from fight import FightClass
 # For select/dropdown:
-from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow, ComponentContext
-from discord.ext import commands
+from discord_slash.utils.manage_components import create_select, create_select_option, create_actionrow
 
 def roll():
     description = "Dice roll command, up to 999,999,999"

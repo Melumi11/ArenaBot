@@ -6,7 +6,6 @@ import logging
 import slashcommands
 
 # My Classes
-import stathandler
 from client import * # Main class responsible for reading messages and stuff
 from fight import * # Fighter class and FightClass which handles the fights
 # -----------------------------------------------------------------------#
