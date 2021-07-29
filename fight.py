@@ -97,10 +97,9 @@ class FightClass():
                 if self.other.hp - self.turn.hp >= 30:
                     await message.channel.send("Comeback rules activate! You roll a d30.")
                     self.damage = random.randint(1, 30)
-                elif self.turn.hp <= 5:
-                    if self.other.hp - self.turn.hp >= 25:
-                        await message.channel.send("5HP comeback rules activate! You roll a d30.")
-                        self.damage = random.randint(1, 30)
+                elif (self.turn.hp <= 5) and (self.other.hp - self.turn.hp >= 25):
+                    await message.channel.send("5HP comeback rules activate! You roll a d30.")
+                    self.damage = random.randint(1, 30)
                 # normal:
                 else:
                     self.damage = random.randint(1, 20) # Lower and upper bound (1, 20)
