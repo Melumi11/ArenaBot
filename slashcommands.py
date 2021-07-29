@@ -106,6 +106,7 @@ def setstats():
             await ctx.send("Your stats cant have commas in them!")
         else:
             stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes)
+            client.luckies[ctx.author.id] = lucky
             await ctx.send("Your stats have been updated!")
 
 
@@ -276,7 +277,7 @@ def setlucky():
                     required=True)]
 
     @slash.slash(name="setlucky", description=description, options=options)
-    async def roll(ctx, lucky):
+    async def setlucky(ctx, lucky):
         if ctx.author.id in client.luckies.keys():
             await ctx.send("Your lucky number is already set as " + str(client.luckies[ctx.author.id]))
         elif 1 <= lucky <= 20:
