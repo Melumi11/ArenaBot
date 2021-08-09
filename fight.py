@@ -420,13 +420,14 @@ class FightClass():
         # ctx.selected_options is a list of all the values the user selected
         if ctx.selected_options == ["official"] or ctx.selected_options == ["casual"]:
             if ctx.author.id == self.p1.id:
-                if ctx.selected_options == ["official"]:
-                    await ctx.send(content=f"{ctx.author.name} has selected `Official Fight`")
+                fight_type = "none"
+                if ctx.selected_options == ["official"]: 
+                    fight_type = "Official"
                     self.track_stats = True
                 if ctx.selected_options == ["casual"]:
-                    await ctx.send(content=f"{ctx.author.name} has selected `Casual Fight`")
+                    fight_type = "Casual"
                     self.track_stats = False
-                if self.track_stats == True: await ctx.send(content="Stats **will** be tracked.")
-                else: await ctx.send(content="Stats will **not** be tracked.")
+                if self.track_stats == True: await ctx.send(content=f"{ctx.author.name} has selected `{fight_type} Fight`\nStats **will** be tracked.")
+                else: await ctx.send(content=f"{ctx.author.name} has selected `{fight_type} Fight`\nStats will **not** be tracked.")
             else:
                 await ctx.send(content=f"You are not {self.p1.name}, you are {ctx.author.name}")

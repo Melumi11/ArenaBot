@@ -102,7 +102,7 @@ def setstats():
     @slash.slash(name="setstats", description=description, options=options)
     async def setstats(ctx, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes):
         if "," in str(special):
-            await ctx.send("Your stats cant have commas in them!")
+            await ctx.send("Your stats can't have commas in them!")
         else:
             stathandler.write(ctx.author.id, special, weapon, lucky, games, wins, losses, draws, ones, twenties, luckies, seventeens, clashes)
             client.luckies[ctx.author.id] = lucky
